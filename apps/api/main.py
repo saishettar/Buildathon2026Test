@@ -17,6 +17,7 @@ from websocket_manager import manager
 from simulator import run_simulation
 from scenarios import SCENARIOS, SCENARIO_LABELS
 from chat import ChatRequest, get_chat_response
+from analysis import analyze_run, summarize_step
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -123,6 +124,35 @@ async def create_step(req: CreateStepRequest):
     })
 
     return step.model_dump()
+
+
+# ── Analysis Endpoints ─────────────────────────────────────────────────────────
+
+@app.get("/api/runs/{run_id}/analyze")
+async def analyze_run_endpoint(run_id: str):
+    """Generate a Claude-powered performance analysis for a run."""
+    run = db.get_run(run_id)
+    if not run:
+        return {"error": "Run not found"}, 404
+    raw_steps = db.get_steps_for_run(run_id)
+    if not raw_steps:
+        return {"error": "No steps found for this run"}, 404
+
+    result = await analyze_run(
+        run.model_dump(),
+        [s.model_dump() for s in raw_steps],
+    )
+    return result.model_dump()
+
+
+@app.get("/api/steps/{step_id}/summarize")
+async def summarize_step_endpoint(step_id: str):
+    """Generate a human-readable summary of a step's input/output."""
+    step = db.get_step(step_id)
+    if not step:
+        return {"error": "Step not found"}, 404
+    result = await summarize_step(step.model_dump())
+    return result.model_dump()
 
 
 # ── Chat Endpoint ──────────────────────────────────────────────────────────────

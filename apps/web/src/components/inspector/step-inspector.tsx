@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -21,8 +21,16 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronRight,
+  Sparkles,
+  Loader2,
+  BookOpen,
+  FileText,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Gauge,
 } from "lucide-react";
 import { cn, formatDuration, formatTokens, formatCost, formatTimestamp } from "@/lib/utils";
+import { summarizeStep, type StepSummaryResponse } from "@/lib/api";
 import type { Step } from "@/types";
 
 interface StepInspectorProps {
@@ -89,6 +97,33 @@ function JsonBlock({ label, data }: { label: string; data: unknown }) {
 }
 
 export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) {
+  const [aiSummary, setAiSummary] = useState<StepSummaryResponse | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [showRaw, setShowRaw] = useState(false);
+  const [lastSummarizedId, setLastSummarizedId] = useState<string | null>(null);
+
+  // Reset when step changes
+  useEffect(() => {
+    if (step && step.step_id !== lastSummarizedId) {
+      setAiSummary(null);
+      setShowRaw(false);
+    }
+  }, [step, lastSummarizedId]);
+
+  const handleSummarize = async () => {
+    if (!step) return;
+    setSummaryLoading(true);
+    try {
+      const result = await summarizeStep(step.step_id);
+      setAiSummary(result);
+      setLastSummarizedId(step.step_id);
+    } catch {
+      // silently fail — user still has raw data
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
   if (!step) return null;
 
   const totalTokens = step.tokens_prompt + step.tokens_completion;
@@ -167,6 +202,119 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
 
             <Separator />
 
+            {/* AI Summary Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-400" />
+                  <span className="text-sm font-semibold">AI Summary</span>
+                </div>
+                {!aiSummary && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSummarize}
+                    disabled={summaryLoading}
+                    className="h-7 text-xs"
+                  >
+                    {summaryLoading ? (
+                      <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3 w-3 mr-1.5" />
+                    )}
+                    {summaryLoading ? "Analyzing..." : "Explain this step"}
+                  </Button>
+                )}
+              </div>
+
+              {aiSummary ? (
+                <div className="space-y-3">
+                  {/* Plain summary */}
+                  <div className="rounded-lg bg-violet-500/5 border border-violet-500/20 p-3">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <BookOpen className="h-3 w-3 text-violet-400" />
+                      <span className="text-[11px] font-medium text-violet-400 uppercase tracking-wider">
+                        What happened
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed">
+                      {aiSummary.plain_summary}
+                    </p>
+                  </div>
+
+                  {/* Input summary */}
+                  <div className="rounded-lg bg-blue-500/5 border border-blue-500/20 p-3">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <ArrowDownToLine className="h-3 w-3 text-blue-400" />
+                      <span className="text-[11px] font-medium text-blue-400 uppercase tracking-wider">
+                        Input
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed">
+                      {aiSummary.input_summary}
+                    </p>
+                  </div>
+
+                  {/* Output summary */}
+                  <div className="rounded-lg bg-green-500/5 border border-green-500/20 p-3">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <ArrowUpFromLine className="h-3 w-3 text-green-400" />
+                      <span className="text-[11px] font-medium text-green-400 uppercase tracking-wider">
+                        Output
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed">
+                      {aiSummary.output_summary}
+                    </p>
+                  </div>
+
+                  {/* Performance note */}
+                  <div className="rounded-lg bg-amber-500/5 border border-amber-500/20 p-3">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <Gauge className="h-3 w-3 text-amber-400" />
+                      <span className="text-[11px] font-medium text-amber-400 uppercase tracking-wider">
+                        Performance
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed">
+                      {aiSummary.performance_note}
+                    </p>
+                  </div>
+                </div>
+              ) : !summaryLoading ? (
+                <p className="text-xs text-muted-foreground pl-6">
+                  Click &quot;Explain this step&quot; to get a human-readable summary of the input
+                  and output data.
+                </p>
+              ) : null}
+            </div>
+
+            <Separator />
+
+            {/* Toggle between Raw & Formatted views */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">
+                {showRaw ? "Raw Data" : "Formatted Data"}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => setShowRaw(!showRaw)}
+              >
+                <FileText className="h-3 w-3 mr-1.5" />
+                {showRaw ? "Show formatted" : "Show raw JSON"}
+              </Button>
+            </div>
+
+            {showRaw ? (
+              <>
+                {/* Raw Input/Output JSON */}
+                <JsonBlock label="Raw Input" data={step.input} />
+                <JsonBlock label="Raw Output" data={step.output} />
+              </>
+            ) : (
+            <>
             {/* LLM-specific: Prompt & Completion */}
             {step.type === "llm" && (
               <>
@@ -256,12 +404,10 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
                 )}
               </div>
             )}
+            </>
+            )}
 
             <Separator />
-
-            {/* Raw Input/Output JSON */}
-            <JsonBlock label="Raw Input" data={step.input} />
-            <JsonBlock label="Raw Output" data={step.output} />
 
             {/* Timestamps */}
             <div className="space-y-1">

@@ -8,13 +8,14 @@ import { ExecutionGraph } from "@/components/graph/execution-graph";
 import { StepInspector } from "@/components/inspector/step-inspector";
 import { RunExplorer } from "@/components/explorer/run-explorer";
 import { ChatPanel } from "@/components/chat/chat-panel";
+import { AnalysisPanel } from "@/components/analysis/analysis-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRun } from "@/hooks/use-runs";
 import { useSteps } from "@/hooks/use-steps";
 import { useRunWebSocket } from "@/hooks/use-websocket";
 import type { Step } from "@/types";
-import { GitBranch, Table2 } from "lucide-react";
+import { GitBranch, Table2, Sparkles } from "lucide-react";
 
 export default function RunPage() {
   const params = useParams();
@@ -58,6 +59,10 @@ export default function RunPage() {
                 <Table2 className="h-3.5 w-3.5" />
                 Run Explorer
               </TabsTrigger>
+              <TabsTrigger value="analysis" className="gap-1.5">
+                <Sparkles className="h-3.5 w-3.5" />
+                AI Analysis
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -85,6 +90,10 @@ export default function RunPage() {
               onStepClick={handleStepClick}
               selectedStepId={selectedStep?.step_id}
             />
+          </TabsContent>
+
+          <TabsContent value="analysis" className="flex-1 m-0 min-h-0">
+            <AnalysisPanel runId={runId} runStatus={run?.status} />
           </TabsContent>
         </Tabs>
       </div>

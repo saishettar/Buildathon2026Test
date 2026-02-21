@@ -79,3 +79,38 @@ export async function sendChatMessage(
     body: JSON.stringify({ messages, run_id: runId }),
   });
 }
+
+// ─── Run Analysis ───────────────────────────────────────────────────────────
+
+export interface RunAnalysis {
+  summary: string;
+  token_analysis: string;
+  cost_analysis: string;
+  latency_analysis: string;
+  error_analysis: string;
+  recommendations: string[];
+  score: number;
+  usage: { input_tokens?: number; output_tokens?: number };
+}
+
+export async function analyzeRun(runId: string): Promise<RunAnalysis> {
+  return fetchJson<RunAnalysis>(`${API_URL}/api/runs/${runId}/analyze`);
+}
+
+// ─── Step Summary ───────────────────────────────────────────────────────────
+
+export interface StepSummaryResponse {
+  plain_summary: string;
+  input_summary: string;
+  output_summary: string;
+  performance_note: string;
+  usage: { input_tokens?: number; output_tokens?: number };
+}
+
+export async function summarizeStep(
+  stepId: string
+): Promise<StepSummaryResponse> {
+  return fetchJson<StepSummaryResponse>(
+    `${API_URL}/api/steps/${stepId}/summarize`
+  );
+}
