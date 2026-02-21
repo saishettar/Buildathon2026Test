@@ -57,3 +57,25 @@ export async function getRunSteps(runId: string): Promise<Step[]> {
 export async function listScenarios(): Promise<ScenariosResponse> {
   return fetchJson<ScenariosResponse>(`${API_URL}/api/scenarios`);
 }
+
+// ─── Chat ───────────────────────────────────────────────────────────────────
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface ChatApiResponse {
+  reply: string;
+  usage: { input_tokens?: number; output_tokens?: number };
+}
+
+export async function sendChatMessage(
+  messages: ChatMessage[],
+  runId?: string
+): Promise<ChatApiResponse> {
+  return fetchJson<ChatApiResponse>(`${API_URL}/api/chat`, {
+    method: "POST",
+    body: JSON.stringify({ messages, run_id: runId }),
+  });
+}

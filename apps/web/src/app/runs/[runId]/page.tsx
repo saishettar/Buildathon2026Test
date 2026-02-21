@@ -7,6 +7,7 @@ import { HeaderStats } from "@/components/layout/header-stats";
 import { ExecutionGraph } from "@/components/graph/execution-graph";
 import { StepInspector } from "@/components/inspector/step-inspector";
 import { RunExplorer } from "@/components/explorer/run-explorer";
+import { ChatPanel } from "@/components/chat/chat-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRun } from "@/hooks/use-runs";
@@ -94,6 +95,9 @@ export default function RunPage() {
         open={inspectorOpen}
         onOpenChange={setInspectorOpen}
       />
+
+      {/* Chat Panel */}
+      <ChatPanel runId={runId} />
     </div>
   );
 }

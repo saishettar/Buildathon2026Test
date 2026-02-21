@@ -16,6 +16,7 @@ from database import db
 from websocket_manager import manager
 from simulator import run_simulation
 from scenarios import SCENARIOS, SCENARIO_LABELS
+from chat import ChatRequest, get_chat_response
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -122,6 +123,26 @@ async def create_step(req: CreateStepRequest):
     })
 
     return step.model_dump()
+
+
+# ── Chat Endpoint ──────────────────────────────────────────────────────────────
+
+@app.post("/api/chat")
+async def chat(req: ChatRequest):
+    """Send a message to the Claude-powered workflow optimization advisor."""
+    run_data = None
+    steps_data = None
+
+    if req.run_id:
+        run = db.get_run(req.run_id)
+        if run:
+            run_data = run.model_dump()
+        raw_steps = db.get_steps_for_run(req.run_id)
+        if raw_steps:
+            steps_data = [s.model_dump() for s in raw_steps]
+
+    result = await get_chat_response(req, run_data, steps_data)
+    return result.model_dump()
 
 
 # ── WebSocket ──────────────────────────────────────────────────────────────────

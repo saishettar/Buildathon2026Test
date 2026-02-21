@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
+import { ChatPanel } from "@/components/chat/chat-panel";
 import { useRuns } from "@/hooks/use-runs";
 import { Activity, ArrowRight } from "lucide-react";
 
@@ -44,6 +45,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+      <ChatPanel />
     </div>
   );
 }
