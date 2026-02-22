@@ -6,6 +6,7 @@ import {
   Activity,
   ChevronDown,
   Circle,
+  Home,
   Play,
   Loader2,
   Sparkles,
@@ -106,6 +107,19 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
       <div className="flex items-center justify-between px-4 py-4">
         <TenorLogo size="sm" />
         <ThemeToggle />
+      </div>
+
+      <Separator />
+
+      {/* Home Button */}
+      <div className="px-3 py-2">
+        <button
+          onClick={() => router.push("/dashboard")}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        >
+          <Home className="h-4 w-4 text-emerald-400" />
+          Home
+        </button>
       </div>
 
       <Separator />
