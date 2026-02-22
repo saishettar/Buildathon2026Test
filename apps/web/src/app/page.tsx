@@ -11,45 +11,10 @@ import { TenorLogo } from "@/components/brand/tenor-logo";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import {
   ArrowRight,
-  GitBranch,
   Zap,
-  BarChart3,
-  Bot,
   Sparkles,
-  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const FEATURES = [
-  {
-    icon: GitBranch,
-    title: "Live Execution Traces",
-    description: "Watch AI agent workflows execute in real-time with interactive DAG visualizations.",
-    color: "text-foreground",
-    bg: "bg-foreground/10",
-  },
-  {
-    icon: BarChart3,
-    title: "Performance Metrics",
-    description: "Token usage, cost analysis, latency percentiles, and health scores at a glance.",
-    color: "text-zinc-400",
-    bg: "bg-zinc-500/10",
-  },
-  {
-    icon: Bot,
-    title: "AI-Powered Analysis",
-    description: "Claude-powered insights that analyze your agent runs and suggest optimizations.",
-    color: "text-zinc-300",
-    bg: "bg-zinc-400/10",
-  },
-  {
-    icon: Eye,
-    title: "Step-Level Inspection",
-    description: "Drill into every LLM call, tool invocation, prompt, completion, and error detail.",
-    color: "text-zinc-500",
-    bg: "bg-zinc-600/10",
-  },
-];
 
 export default function LandingPage() {
   const router = useRouter();
@@ -119,35 +84,6 @@ export default function LandingPage() {
               Launch Dashboard
               <ArrowRight className="h-4 w-4" />
             </Button>
-          </div>
-        </div>
-
-        {/* Features Grid */}
-        <div className="mt-24 max-w-4xl w-full mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {FEATURES.map((feature) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={feature.title}
-                  className="group rounded-xl border border-border bg-card/50 backdrop-blur-sm p-6 transition-all duration-300 hover:border-zinc-500/30 hover:shadow-lg hover:shadow-zinc-500/5"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${feature.bg}`}>
-                      <Icon className={`h-5 w-5 ${feature.color}`} />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-semibold text-foreground group-hover:text-foreground/90">
-                        {feature.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                        {feature.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
 

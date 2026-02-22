@@ -1,29 +1,35 @@
-# UAOP – Universal Agent Observability Platform
+# Tenor – AI Agent Observability Platform
 
-> Real-time observability for AI agent execution traces. Watch agent reasoning unfold as a live, growing DAG with full step inspection.
+> Real-time observability for AI agent execution traces. See every step your AI agents take — rendered as a live, interactive DAG with full step inspection, cost tracking, and AI-powered optimization.
 
 ![Status](https://img.shields.io/badge/status-demo-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-14-black)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.109-009688)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6)
+![Claude](https://img.shields.io/badge/Claude-Sonnet%204-blueviolet)
 
 ---
 
 ## Overview
 
-UAOP provides a production-grade observability UI for AI agent systems. It displays real-time execution traces as interactive DAG graphs, with full step inspection including prompts, completions, tool calls, errors, token counts, and costs.
+Tenor is a production-grade observability platform purpose-built for AI agent systems. It renders real-time execution traces as interactive Directed Acyclic Graphs (DAGs) that grow live as agent steps execute — capturing prompts, completions, tool calls, errors, token counts, costs, and latency for every step.
+
+The platform includes **9 real Claude-powered agent scenarios** that make live Anthropic API calls, plus **5 simulated demo scenarios** for instant demos without API costs.
 
 ### Key Features
 
-- **Live Execution Graph** – React Flow-powered DAG that grows in real-time as agent steps execute
+- **Live Execution Graph** – React Flow-powered DAG that grows in real-time via WebSocket streaming
+- **9 Real Claude Agents** – Live Claude API-powered scenarios: hotel research, code generation, deep research, query optimization, and more
+- **5 Simulated Scenarios** – Instant demo scenarios with realistic delays and token counts (no API key needed)
 - **Node Status Coloring** – Blue (LLM), Purple (Tool), Amber (Plan), Green (Final), Red (Error)
 - **Step Inspector** – Slide-over panel with full details: prompts, completions, tool args, errors, tokens, cost
 - **Run Explorer Table** – Searchable/filterable table view with type and status filters
-- **Header Stats** – Duration, total tokens, estimated cost for the current run
-- **5 Demo Scenarios** – Flight booking (with retry), research summarizer, code assistant, customer support, simple happy path
-- **Real-Time WebSockets** – Steps stream live from backend to frontend per-run
-- **AI Optimization Advisor** – Claude-powered fleet analysis with optimization score, agent recommendations, model swap suggestions, and automation ideas
+- **AI Optimization Dashboard** – Claude-powered fleet analysis with optimization score, agent/model recommendations, and automation suggestions
+- **AI Run Analysis** – One-click Claude analysis of any completed run with structured performance reports
+- **AI Chat Advisor** – Persistent Claude chat panel with context-aware optimization advice
+- **Real-Time WebSockets** – Steps stream live per-run with auto-reconnect
 - **Dark Mode** – Dark by default with light mode toggle
+- **Retry-Resilient API Calls** – Exponential backoff retry logic for all Claude API calls
 - **Production-Grade UI** – shadcn/ui components, skeleton loaders, empty states, animations
 
 ---
@@ -31,17 +37,20 @@ UAOP provides a production-grade observability UI for AI agent systems. It displ
 ## Architecture
 
 ```
-┌─────────────┐     REST + WS      ┌──────────────┐     ┌───────────────┐
-│   Next.js   │ ◄────────────────► │   FastAPI     │────►│  Claude API   │
-│   (React)   │   /api/runs, etc.  │   (Python)    │     │  (Anthropic)  │
-│   Port 3000 │   ws://…/ws/runs/  │   Port 8000   │     └───────────────┘
-└─────────────┘                    └──────┬───────┘
-                                         │
-                                   In-Memory Store
-                                   (swappable for Postgres)
+┌─────────────────┐    REST + WebSocket    ┌──────────────────┐     ┌───────────────┐
+│   Next.js 14    │ ◄────────────────────► │   FastAPI         │────►│  Claude API   │
+│   React 18      │   /api/runs, /api/chat │   (Python)        │     │  (Anthropic)  │
+│   TypeScript    │   /api/analyze         │   Pydantic v2     │     └───────────────┘
+│   Port 3000     │   ws://…/ws/runs/{id}  │   Port 8000       │
+└─────────────────┘                        └────────┬─────────┘
+                                                    │
+                                              In-Memory Store
+                                           (swappable for Postgres)
 ```
 
 ### Data Model (Universal Contract)
+
+A framework-agnostic schema that works with any AI agent system.
 
 **Run:**
 ```json
@@ -50,7 +59,7 @@ UAOP provides a production-grade observability UI for AI agent systems. It displ
   "created_at": "iso",
   "updated_at": "iso",
   "status": "running|completed|failed",
-  "system_type": "mock|openclaw|claude|other",
+  "system_type": "mock|claude|openai|perplexity|openclaw|other",
   "root_step_id": "uuid|null",
   "metadata": { "user_id": "demo", "tags": ["demo"] }
 }
@@ -83,58 +92,46 @@ UAOP provides a production-grade observability UI for AI agent systems. It displ
 
 ### Prerequisites
 
-- **Node.js** 18+ and **pnpm** (or npm/yarn)
-- **Python** 3.10+
-- (Optional) **Docker** and **Docker Compose** for containerized setup
-- (Optional) **Anthropic API Key** – required for the AI Optimization feature
-
-> Set the `ANTHROPIC_API_KEY` environment variable before starting the backend to enable AI-powered optimization analysis.
+- **Node.js** 18+ and **pnpm**
+- **Python** 3.9+
+- **Anthropic API Key** – required for real Claude agent scenarios and AI features
 
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/your-org/uaop-demo.git
-cd uaop-demo
+git clone https://github.com/saishettar/Buildathon2026Test.git
+cd Buildathon2026Test
 
-# Install frontend dependencies
-cd apps/web
-pnpm install
-cd ../..
+# Install all dependencies at once
+pnpm install:all
 
-# Install backend dependencies
-cd apps/api
-pip install -r requirements.txt
-cd ../..
+# Or install separately:
+# pnpm install && cd apps/api && pip install -r requirements.txt
 ```
 
-### 2. Start the Backend (FastAPI)
+### 2. Set Your API Key
 
 ```bash
-cd apps/api
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+export ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-The API will be available at `http://localhost:8000`. You can verify with:
-```bash
-curl http://localhost:8000/api/health
-```
-
-### 3. Start the Frontend (Next.js)
+### 3. Start Everything
 
 ```bash
-cd apps/web
 pnpm dev
 ```
 
-The UI will be available at `http://localhost:3000`.
+This starts both servers concurrently:
+- **Web UI:** http://localhost:3000
+- **API:** http://localhost:8000
 
-### 4. Run a Demo
+### 4. Run an Agent
 
-1. Open `http://localhost:3000` in your browser
+1. Open http://localhost:3000
 2. Click **"Start Demo Run"** in the left sidebar
-3. Choose one of the 5 scenarios
+3. Choose a **real Claude scenario** (e.g., Hotel Research Agent) or a **simulated scenario**
 4. Watch the execution graph build in real-time!
-5. Click any node to open the inspector panel
+5. Click any node to open the step inspector
 
 ---
 
@@ -147,22 +144,40 @@ docker compose up --build
 ```
 
 This starts:
-- **PostgreSQL** on port 5432
+- **PostgreSQL 16** on port 5432
 - **FastAPI** on port 8000
 - **Next.js** on port 3000
 
-> Note: The demo currently uses in-memory storage. PostgreSQL is provisioned for future use.
+> The demo currently uses in-memory storage. PostgreSQL is provisioned for production use.
 
 ---
 
-## Demo Scenarios
+## Agent Scenarios
+
+### Real Claude-Powered Agents (requires `ANTHROPIC_API_KEY`)
+
+These scenarios make **live Claude API calls** and produce real LLM outputs:
+
+| Scenario | Description |
+|----------|-------------|
+| **Hotel Research Agent** | Researches hotels near Times Square, compares prices, and recommends the best option |
+| **Code Generator Agent** | Plans, writes, saves, and reviews a Tic Tac Toe game with working Python code |
+| **Research & Summarize Agent** | Researches AI regulation across US and EU in parallel and synthesizes findings |
+| **Deep Research Agent** | Fact-checking agent that verifies claims using parallel multi-source research with confidence ratings |
+| **API Integration Planner** | Designs a Stripe-to-Postgres integration with webhook handler and database layer code generation |
+| **Incident Response Agent** | SRE agent that triages alerts, runs parallel diagnostics, identifies root cause, and drafts communications |
+| **Query Optimizer Agent** | Analyzes slow SQL queries, rewrites them, generates indexes, and estimates performance gains |
+| **Microservice Decomposition Agent** | Decomposes a monolith into microservices with API design, communication mapping, and migration planning |
+| **Contract Analyzer Agent** | Legal analyst that reviews SaaS contracts, risk-rates clauses, and drafts redline negotiation suggestions |
+
+### Simulated Demo Scenarios (no API key needed)
 
 | Scenario | Description | Key Features |
 |----------|-------------|--------------|
 | **Flight Booking** | Agent books a flight, payment fails, retries with backup card | Error → retry flow, red nodes |
 | **Research Summarizer** | Parallel web searches, synthesis, final summary | Branching tree, multiple tool calls |
-| **Code Assistant** | Reads files, analyzes error, generates fix, runs tests | Deep chain, mixed tool/LLM steps |
-| **Customer Support** | Classifies intent, retrieves KB, drafts response | Parallel retrieval, quality check |
+| **Code Assistant** | Reads files, analyzes error, generates fix | Deep chain, mixed tool/LLM steps |
+| **Customer Support** | Classifies intent, retrieves KB, drafts response | Multi-tool orchestration |
 | **Simple Happy Path** | Plan → Tool → LLM → Final | Clean linear flow |
 
 ---
@@ -171,13 +186,18 @@ This starts:
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/runs` | Create a run (optionally with scenario) |
-| `GET` | `/api/runs` | List recent runs |
+| `GET` | `/api/health` | Health check |
+| `GET` | `/api/scenarios` | List all available scenarios (simulated + real) |
+| `POST` | `/api/runs` | Create a simulated run (with scenario) |
+| `POST` | `/api/runs/real` | Create a real Claude-powered run |
+| `GET` | `/api/runs` | List recent runs (limit param, default 50) |
 | `GET` | `/api/runs/{run_id}` | Get a single run |
 | `GET` | `/api/runs/{run_id}/steps` | Get all steps for a run |
 | `POST` | `/api/steps` | Create a step manually |
-| `GET` | `/api/scenarios` | List available demo scenarios |
-| `GET` | `/api/optimization` | AI-powered fleet optimization analysis (requires `ANTHROPIC_API_KEY`) |
+| `GET` | `/api/runs/{run_id}/analyze` | Claude-powered run performance analysis |
+| `GET` | `/api/steps/{step_id}/summarize` | Claude-powered step summary |
+| `POST` | `/api/chat` | Send message to Claude optimization advisor |
+| `GET` | `/api/optimization` | AI fleet optimization analysis |
 | `WS` | `/ws/runs/{run_id}` | Real-time step/run updates |
 
 ### WebSocket Messages
@@ -189,44 +209,46 @@ This starts:
 
 ---
 
-## AI Optimization
+## AI Features
 
-The **AI Optimization** page (`/optimization`) uses Claude to analyze your entire fleet of agent runs and deliver actionable insights.
+### Fleet Optimization Dashboard (`/optimization`)
 
-### How It Works
+Claude analyzes your entire fleet of agent runs and delivers actionable insights:
 
-1. **Analytics Engine** – On startup, the backend loads 1,000 historical runs and 7,388 steps from CSV. A pure-Python analytics engine computes per-scenario stats, per-model breakdowns, error hotspots, merge candidates, and scheduling patterns.
-2. **Claude Analysis** – When you visit the page, the backend sends the pre-computed analytics summary (plus a truncated CSV sample) to Claude, which returns a structured JSON optimization report.
-3. **Caching** – Results are cached for 10 minutes to avoid redundant API calls. Errors are never cached.
-
-### Dashboard Sections
+1. **Analytics Engine** – On startup, loads 1,000 historical runs and 7,388 steps from CSV. A pure-Python analytics engine computes per-scenario stats, per-model breakdowns, error hotspots, and scheduling patterns.
+2. **Claude Analysis** – Sends pre-computed analytics to Claude, which returns a structured JSON optimization report.
+3. **Caching** – Results cached for 10 minutes. Errors are never cached.
 
 | Section | Description |
 |---------|-------------|
-| **Optimization Score** | 0–100 gauge (red ≤ 40, amber ≤ 70, green > 70) with a one-line summary |
-| **Agent Recommendations** | Priority-sorted cards with specific actions per agent/scenario |
-| **Automation Suggestions** | Ideas for automating repetitive patterns detected in the fleet |
-| **Model Recommendations** | Suggested model swaps (e.g. GPT-4 → Claude 3.5 Haiku) with estimated savings |
-| **Agents to Watch** | Amber warning cards for agents showing concerning trends |
+| **Optimization Score** | 0–100 gauge (red ≤ 40, amber ≤ 70, green > 70) with summary |
+| **Agent Recommendations** | Priority-sorted actions per agent/scenario |
+| **Automation Suggestions** | Ideas for automating repetitive patterns |
+| **Model Recommendations** | Model swap suggestions with estimated savings |
+| **Agents to Watch** | Warning cards for agents with concerning trends |
 
-### Environment Variables
+### Run Performance Analysis
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | Yes | Your Anthropic API key for Claude access |
+One-click analysis from the **AI Analysis** tab on any run. Claude produces a structured report with: summary, token analysis, cost analysis, latency analysis, error analysis, recommendations, and a 0–100 score.
 
-> If the key is missing, the page shows a friendly setup prompt instead of an error.
+### Step Summarization
+
+Per-step plain-English explanations of raw input/output data, accessible from the step inspector.
+
+### Chat Advisor
+
+Persistent right-side chat panel on every page. Context-aware — automatically includes current run data for targeted optimization advice.
 
 ---
 
 ## Cost Calculation
 
-Token costs are computed per-step using hardcoded rates:
+Token costs are computed per-step using model-specific rates:
 
 | Model | Prompt (per 1K) | Completion (per 1K) |
 |-------|-----------------|---------------------|
 | GPT-4 | $0.030 | $0.060 |
-| Claude 3.5 | $0.003 | $0.015 |
+| Claude 3.5 Sonnet | $0.003 | $0.015 |
 | Default (demo) | $0.010 | $0.030 |
 
 ---
@@ -234,45 +256,54 @@ Token costs are computed per-step using hardcoded rates:
 ## Project Structure
 
 ```
-Buildathon2026/
+Buildathon2026Test/
 ├── package.json                    # Root monorepo scripts
-├── pnpm-workspace.yaml
-├── docker-compose.yml
+├── pnpm-workspace.yaml             # pnpm workspaces config
+├── docker-compose.yml              # Containerized deployment
+├── PROJECT_DESCRIPTION.txt         # Comprehensive project documentation
 ├── apps/
 │   ├── api/                        # FastAPI backend
-│   │   ├── main.py                 # App, routes, WebSocket
-│   │   ├── models.py               # Pydantic models
-│   │   ├── database.py             # In-memory store
-│   │   ├── simulator.py            # Step emission engine
-│   │   ├── scenarios.py            # 5 demo scenario trees
-│   │   ├── analytics_engine.py     # CSV analytics (per-scenario, per-model stats)
-│   │   ├── optimization.py         # AI Optimization endpoint (Claude API)
+│   │   ├── main.py                 # App entrypoint, routes, WebSocket
+│   │   ├── models.py               # Pydantic models (Run, Step, enums)
+│   │   ├── database.py             # In-memory store (Postgres-ready)
+│   │   ├── real_agents.py          # 9 real Claude-powered agent scenarios
+│   │   ├── simulator.py            # Simulated step emission engine
+│   │   ├── scenarios.py            # 5 demo scenarios + real scenario metadata
+│   │   ├── analytics_engine.py     # CSV analytics (per-scenario, per-model)
+│   │   ├── optimization.py         # AI fleet optimization (Claude API)
+│   │   ├── analysis.py             # Claude run analysis + step summaries
+│   │   ├── chat.py                 # Claude optimization chat advisor
+│   │   ├── websocket_manager.py    # Per-run WS room manager
 │   │   ├── data/                   # Reference CSV datasets
 │   │   │   ├── runsBig.csv         # 1,000 historical runs
 │   │   │   └── stepsBig.csv        # 7,388 historical steps
-│   │   ├── websocket_manager.py    # WS connection manager
+│   │   ├── generated/              # Files generated by real agents
 │   │   ├── requirements.txt
 │   │   └── Dockerfile
 │   └── web/                        # Next.js frontend
 │       ├── src/
 │       │   ├── app/
-│       │   │   ├── layout.tsx       # Root layout
-│       │   │   ├── page.tsx         # Dashboard
+│       │   │   ├── layout.tsx       # Root layout with TenorLogo
+│       │   │   ├── page.tsx         # Landing page
 │       │   │   ├── providers.tsx    # Query + Theme providers
-│       │   │   ├── globals.css      # Tailwind + CSS vars
-│       │   │   ├── optimization/
-│       │   │   │   └── page.tsx     # AI Optimization dashboard
-│       │   │   └── runs/[runId]/
-│       │   │       └── page.tsx     # Run workspace
+│       │   │   ├── globals.css      # Tailwind + CSS custom properties
+│       │   │   ├── dashboard/       # Main dashboard with run grid
+│       │   │   ├── optimization/    # AI Optimization dashboard
+│       │   │   └── runs/[runId]/    # Run detail with 6-tab interface
 │       │   ├── components/
-│       │   │   ├── ui/              # shadcn/ui components
+│       │   │   ├── brand/           # TenorLogo with animated SVG
+│       │   │   ├── ui/              # shadcn/ui primitives (13+ components)
 │       │   │   ├── layout/          # Sidebar, HeaderStats, ThemeToggle
-│       │   │   ├── graph/           # ExecutionGraph, StepNode, layout utils
+│       │   │   ├── graph/           # ExecutionGraph, StepNode, dagre layout
 │       │   │   ├── inspector/       # StepInspector slide-over
-│       │   │   ├── optimization/    # AI Optimization components
-│       │   │   └── explorer/        # RunExplorer table
-│       │   ├── hooks/               # useRuns, useSteps, useWebSocket
-│       │   ├── lib/                 # api, websocket, utils, cost
+│       │   │   ├── explorer/        # RunExplorer table
+│       │   │   ├── detail/          # DetailHeader, ExecutionChain, Metrics, AI Advisor
+│       │   │   ├── dashboard/       # HeroChart, SummaryStats, AgentCard
+│       │   │   ├── optimization/    # ScoreGauge, Recommendations, Suggestions
+│       │   │   ├── analysis/        # AnalysisPanel
+│       │   │   └── chat/            # ChatPanel
+│       │   ├── hooks/               # useRuns, useSteps, useWebSocket, useOptimization
+│       │   ├── lib/                 # api, websocket, utils, cost, optimization-api
 │       │   └── types/               # TypeScript type definitions
 │       ├── package.json
 │       ├── tailwind.config.ts
@@ -282,17 +313,25 @@ Buildathon2026/
 
 ---
 
+## Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `ANTHROPIC_API_KEY` | For real agents & AI features | — | Anthropic API key for Claude |
+| `NEXT_PUBLIC_API_URL` | No | `http://localhost:8000` | Backend REST API URL |
+| `NEXT_PUBLIC_WS_URL` | No | `ws://localhost:8000` | Backend WebSocket URL |
+| `DATABASE_URL` | Docker only | — | PostgreSQL connection string |
+| `CORS_ORIGINS` | Docker only | — | Allowed CORS origins |
+
+---
+
 ## Extending for Production
 
-The demo is designed to be easily extended:
-
-1. **Swap storage**: Replace `database.py` with a PostgreSQL-backed store using SQLAlchemy/asyncpg. The data model is already Postgres-compatible.
-
-2. **Real agent ingestion**: Replace or supplement the simulator with real agent trace ingestion. The API endpoints (`POST /api/runs`, `POST /api/steps`) already accept the universal contract format.
-
-3. **Authentication**: Add JWT auth middleware to FastAPI and corresponding token handling in the frontend.
-
-4. **Multi-tenancy**: The `RunMetadata.user_id` field is already in the schema for filtering by user.
+1. **Swap storage** – Replace `database.py` with PostgreSQL via SQLAlchemy/asyncpg. The data model is already Postgres-compatible.
+2. **Real agent ingestion** – Use `POST /api/runs` + `POST /api/steps` to ingest traces from any agent framework (LangChain, CrewAI, AutoGen, etc.).
+3. **Authentication** – Add JWT auth middleware to FastAPI.
+4. **Multi-tenancy** – `RunMetadata.user_id` is already in the schema for per-user filtering.
+5. **Alerting** – Add cost budgets and Slack/email notifications on failures.
 
 ---
 
@@ -300,14 +339,15 @@ The demo is designed to be easily extended:
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 14, React 18, TypeScript |
+| Frontend | Next.js 14, React 18, TypeScript 5.4 |
 | Styling | Tailwind CSS, shadcn/ui, Radix UI |
-| Graph | React Flow, dagre |
-| State | TanStack Query (React Query) |
-| Real-time | WebSockets |
-| Backend | FastAPI, Pydantic v2 |
-| AI | Claude claude-sonnet-4-20250514 via Anthropic SDK |
+| Charts | Recharts, React Flow, dagre |
+| State | TanStack Query v5 (React Query) |
+| Real-time | WebSockets with auto-reconnect |
+| Backend | FastAPI, Pydantic v2, uvicorn |
+| AI | Claude Sonnet 4 via Anthropic SDK (with retry + backoff) |
 | Storage | In-memory (Postgres-ready schema) |
+| Infrastructure | Docker, Docker Compose, pnpm workspaces |
 
 ---
 

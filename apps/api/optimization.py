@@ -162,12 +162,25 @@ async def get_optimization():
         import anthropic
 
         client = anthropic.Anthropic(api_key=api_key)
-        message = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=4096,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        message = None
+        last_exc = None
+        for attempt in range(3):
+            try:
+                message = client.messages.create(
+                    model="claude-sonnet-4-20250514",
+                    max_tokens=4096,
+                    system=system_prompt,
+                    messages=[{"role": "user", "content": user_message}],
+                )
+                break
+            except (anthropic.APIConnectionError, anthropic.APITimeoutError) as e:
+                last_exc = e
+                wait = (2 ** attempt) + 0.5
+                logger.warning(f"Claude API attempt {attempt + 1}/3 failed: {e}. Retrying in {wait:.1f}s...")
+                import asyncio
+                await asyncio.sleep(wait)
+        if message is None:
+            raise last_exc  # type: ignore[misc]
 
         raw_text = message.content[0].text
         # Strip potential markdown fences

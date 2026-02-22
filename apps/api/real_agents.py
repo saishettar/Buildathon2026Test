@@ -103,19 +103,29 @@ async def _call_claude(
     system: str,
     user_prompt: str,
     max_tokens: int = 1024,
+    max_retries: int = 3,
 ) -> tuple[str, int, int, int]:
-    """Make a real Claude API call. Returns (text, input_tokens, output_tokens, duration_ms)."""
-    t0 = time.monotonic()
-    response = await asyncio.to_thread(
-        client.messages.create,
-        model=CLAUDE_MODEL,
-        max_tokens=max_tokens,
-        system=system,
-        messages=[{"role": "user", "content": user_prompt}],
-    )
-    duration_ms = int((time.monotonic() - t0) * 1000)
-    text = response.content[0].text
-    return text, response.usage.input_tokens, response.usage.output_tokens, duration_ms
+    """Make a real Claude API call with retry logic. Returns (text, input_tokens, output_tokens, duration_ms)."""
+    last_exc = None
+    for attempt in range(max_retries):
+        try:
+            t0 = time.monotonic()
+            response = await asyncio.to_thread(
+                client.messages.create,
+                model=CLAUDE_MODEL,
+                max_tokens=max_tokens,
+                system=system,
+                messages=[{"role": "user", "content": user_prompt}],
+            )
+            duration_ms = int((time.monotonic() - t0) * 1000)
+            text = response.content[0].text
+            return text, response.usage.input_tokens, response.usage.output_tokens, duration_ms
+        except (anthropic.APIConnectionError, anthropic.APITimeoutError) as e:
+            last_exc = e
+            wait = (2 ** attempt) + 0.5
+            logger.warning(f"Claude API attempt {attempt + 1}/{max_retries} failed: {e}. Retrying in {wait:.1f}s...")
+            await asyncio.sleep(wait)
+    raise last_exc  # type: ignore[misc]
 
 
 async def _finish_run(run_id: str, status: RunStatus) -> None:
