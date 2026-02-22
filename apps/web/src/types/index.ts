@@ -2,7 +2,7 @@
 // Matches the backend models exactly.
 
 export type RunStatus = "running" | "completed" | "failed";
-export type SystemType = "mock" | "openclaw" | "claude" | "other";
+export type SystemType = "mock" | "openclaw" | "claude" | "openai" | "perplexity" | "other";
 export type StepType = "llm" | "tool" | "plan" | "final" | "error";
 export type StepStatus = "running" | "completed" | "failed" | "retrying";
 

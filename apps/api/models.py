@@ -21,6 +21,8 @@ class SystemType(str, Enum):
     mock = "mock"
     openclaw = "openclaw"
     claude = "claude"
+    openai = "openai"
+    perplexity = "perplexity"
     other = "other"
 
 

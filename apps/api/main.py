@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import random
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 
@@ -92,8 +93,14 @@ async def create_real_run(req: RealRunRequest):
     if req.scenario not in REAL_SCENARIOS:
         raise HTTPException(status_code=400, detail=f"Unknown real scenario: {req.scenario}")
 
+    live_system_types = [
+        SystemType.claude,
+        SystemType.openai,
+        SystemType.perplexity,
+        SystemType.openclaw,
+    ]
     run = Run(
-        system_type=SystemType.claude,
+        system_type=random.choice(live_system_types),
         metadata=RunMetadata(tags=["real", req.scenario]),
     )
     db.create_run(run)
