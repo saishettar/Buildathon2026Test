@@ -29,8 +29,8 @@ class ChatResponse(BaseModel):
 # ── System prompt ──────────────────────────────────────────────────────────────
 
 SYSTEM_PROMPT = """\
-You are an expert AI workflow optimization advisor embedded in a Universal Agent \
-Orchestration Platform (UAOP). Your job is to analyze agentic workflow execution \
+You are an expert AI workflow optimization advisor embedded in Tenor, an AI Agent \
+Observability Platform. Your job is to analyze agentic workflow execution \
 traces and suggest concrete, actionable optimizations.
 
 When given workflow data (runs with steps), analyze:

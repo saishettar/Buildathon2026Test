@@ -27,25 +27,26 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
+    /* Enhanced dark theme: GitHub-style dark background */
+    --background: 215 28% 5%;       /* ~#0d1117 */
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --card: 215 21% 11%;            /* ~#161b22 */
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
+    --popover: 215 21% 11%;
     --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
+    --primary-foreground: 215 28% 5%;
+    --secondary: 215 14% 16%;      /* ~#21262d */
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
+    --muted: 215 14% 16%;
+    --muted-foreground: 215 8% 55%;
+    --accent: 215 14% 16%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --border: 215 14% 18%;          /* ~#30363d */
+    --input: 215 14% 18%;
+    --ring: 187 80% 55%;            /* Cyan ring */
   }
 }
 
@@ -112,4 +113,68 @@
 
 .node-animate-in {
   animation: node-appear 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Dashboard enhancement animations ──────────────────────────────── */
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-animate-in {
+  animation: card-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+/* Staggered card animation delays */
+.card-animate-in:nth-child(1) { animation-delay: 0ms; }
+.card-animate-in:nth-child(2) { animation-delay: 50ms; }
+.card-animate-in:nth-child(3) { animation-delay: 100ms; }
+.card-animate-in:nth-child(4) { animation-delay: 150ms; }
+.card-animate-in:nth-child(5) { animation-delay: 200ms; }
+.card-animate-in:nth-child(6) { animation-delay: 250ms; }
+.card-animate-in:nth-child(7) { animation-delay: 300ms; }
+.card-animate-in:nth-child(8) { animation-delay: 350ms; }
+
+@keyframes chart-draw {
+  from {
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 211, 238, 0);
+  }
+  50% {
+    box-shadow: 0 0 12px 2px rgba(34, 211, 238, 0.15);
+  }
+}
+
+.glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* Smooth page transitions */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.page-transition {
+  animation: page-enter 0.3s ease-out;
 }

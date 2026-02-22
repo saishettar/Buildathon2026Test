@@ -1,9 +1,12 @@
-"""UAOP Demo – FastAPI application."""
+"""Tenor – FastAPI application."""
 from __future__ import annotations
 
 import asyncio
 import logging
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+
+load_dotenv()  # Load .env file (e.g. ANTHROPIC_API_KEY)
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,13 +28,13 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("UAOP API starting up")
+    logger.info("Tenor API starting up")
     yield
-    logger.info("UAOP API shutting down")
+    logger.info("Tenor API shutting down")
 
 
 app = FastAPI(
-    title="UAOP Demo API",
+    title="Tenor API",
     version="0.1.0",
     lifespan=lifespan,
 )
@@ -50,7 +53,7 @@ app.add_middleware(
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "service": "uaop-api"}
+    return {"status": "ok", "service": "tenor-api"}
 
 
 @app.get("/api/scenarios")
