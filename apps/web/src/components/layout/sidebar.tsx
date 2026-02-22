@@ -7,6 +7,7 @@ import {
   Circle,
   Play,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -106,6 +107,19 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+
+      <Separator />
+
+      {/* AI Optimization link */}
+      <div className="px-3 py-2">
+        <button
+          onClick={() => router.push("/optimization")}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        >
+          <Sparkles className="h-4 w-4 text-purple-400" />
+          AI Optimization
+        </button>
       </div>
 
       <Separator />

@@ -1,0 +1,756 @@
+================================================================================
+                         TENOR — AI AGENT OBSERVABILITY PLATFORM
+                           Comprehensive Project Description
+================================================================================
+
+Project Name:       Tenor (formerly UAOP — Universal Agent Observability Platform)
+Repository:         https://github.com/saishettar/Buildathon2026Test
+Version:            0.1.0
+Status:             Demo / Prototype
+License:            Private
+Last Updated:       February 2026
+
+
+────────────────────────────────────────────────────────────────────────────────
+1. EXECUTIVE SUMMARY
+────────────────────────────────────────────────────────────────────────────────
+
+Tenor is a production-grade, real-time observability platform purpose-built for
+AI agent systems. It provides a rich visual interface for monitoring, inspecting,
+and optimizing AI agent execution traces — the step-by-step reasoning and action
+sequences that LLM-powered agents perform to complete tasks.
+
+The platform renders live execution traces as interactive Directed Acyclic Graphs
+(DAGs) that grow in real-time as agent steps execute. Every step — whether an LLM
+inference call, a tool invocation, a planning phase, or a final output — is
+captured with full metadata including prompts, completions, token counts, costs,
+latency, and error details.
+
+Tenor also integrates Claude (Anthropic's LLM) as an embedded AI advisor that
+can analyze workflow performance and suggest concrete optimizations like
+parallelization opportunities, cost reductions, and error handling improvements.
+
+
+────────────────────────────────────────────────────────────────────────────────
+2. PROBLEM STATEMENT
+────────────────────────────────────────────────────────────────────────────────
+
+As AI agent systems grow in complexity — often involving multi-step chains of
+LLM calls, tool invocations, planning loops, retries, and error recovery — teams
+lack visibility into:
+
+  • What steps did the agent take, and in what order?
+  • How long did each step take? What was the critical path?
+  • How many tokens were consumed and at what cost?
+  • Where did failures occur and how were they handled?
+  • Are there opportunities to parallelize, cache, or optimize?
+
+Existing logging and monitoring solutions are not designed for the DAG-like,
+branching nature of agent workflows. Tenor solves this by providing purpose-built
+observability with real-time streaming, interactive graph visualization, and
+AI-powered analysis.
+
+
+────────────────────────────────────────────────────────────────────────────────
+3. ARCHITECTURE OVERVIEW
+────────────────────────────────────────────────────────────────────────────────
+
+Tenor is a monorepo containing two main applications:
+
+  ┌─────────────────┐     REST + WebSocket     ┌──────────────────┐
+  │   FRONTEND       │ ◄──────────────────────► │   BACKEND         │
+  │   Next.js 14     │   /api/runs, /api/steps  │   FastAPI (Python) │
+  │   React 18       │   /api/chat, /api/analyze│   Pydantic v2      │
+  │   TypeScript 5.4 │   ws://…/ws/runs/{id}    │   Anthropic SDK    │
+  │   Port 3000      │                          │   Port 8000        │
+  └─────────────────┘                          └────────┬─────────┘
+                                                        │
+                                                  In-Memory Store
+                                               (swappable for Postgres)
+
+3.1 Monorepo Structure
+
+  /
+  ├── package.json              # Root workspace scripts (dev, build, install)
+  ├── pnpm-workspace.yaml       # pnpm workspaces config
+  ├── pnpm-lock.yaml            # Dependency lockfile
+  ├── docker-compose.yml        # Containerized deployment (API + Web + Postgres)
+  │
+  ├── apps/
+  │   ├── api/                  # Python FastAPI backend
+  │   │   ├── main.py           # App entrypoint, CORS, REST + WS endpoints
+  │   │   ├── models.py         # Pydantic models (Run, Step, enums, requests)
+  │   │   ├── database.py       # In-memory data store (dict-based)
+  │   │   ├── simulator.py      # Scenario simulation engine
+  │   │   ├── scenarios.py      # 5 predefined demo scenarios
+  │   │   ├── websocket_manager.py  # Per-run WS room management
+  │   │   ├── chat.py           # Claude-powered optimization advisor
+  │   │   ├── analysis.py       # Claude-powered run analysis + step summaries
+  │   │   ├── requirements.txt  # Python dependencies
+  │   │   └── Dockerfile        # Container build for API
+  │   │
+  │   └── web/                  # Next.js 14 frontend
+  │       ├── src/
+  │       │   ├── app/          # Next.js App Router pages
+  │       │   ├── components/   # React components (30+ files)
+  │       │   ├── hooks/        # Custom React hooks (4 hooks)
+  │       │   ├── lib/          # Utilities, API client, WebSocket client
+  │       │   └── types/        # TypeScript type definitions
+  │       ├── package.json      # Frontend dependencies
+  │       ├── tailwind.config.ts
+  │       ├── tsconfig.json
+  │       └── Dockerfile
+  │
+  └── .env                      # Environment variables (ANTHROPIC_API_KEY)
+
+
+────────────────────────────────────────────────────────────────────────────────
+4. TECHNOLOGY STACK
+────────────────────────────────────────────────────────────────────────────────
+
+4.1 Frontend (apps/web)
+
+  Framework:         Next.js 14.2 (App Router, React Server Components)
+  Language:          TypeScript 5.4
+  UI Library:        React 18.3
+  Styling:           Tailwind CSS 3.4 with CSS custom properties for theming
+  Component Library: shadcn/ui (Radix UI primitives + Tailwind styling)
+    - Radix UI:      Dialog, Tabs, Select, DropdownMenu, ScrollArea,
+                     Separator, Tooltip, Slot
+  Graph Library:     React Flow 11.11 (interactive node-based graph rendering)
+  Graph Layout:      dagre 0.8.5 (automatic DAG layout algorithm)
+  Data Fetching:     TanStack React Query v5 (caching, refetching, mutations)
+  Theme Engine:      next-themes 0.3 (class-based dark/light toggle)
+  Icons:             lucide-react 0.400 (200+ SVG icons)
+  Notifications:     sonner 1.5 (toast notifications)
+  Validation:        zod 3.23 (runtime schema validation)
+  Date Formatting:   date-fns 3.6
+  Class Utilities:   clsx 2.1, tailwind-merge 2.3, class-variance-authority 0.7
+  Package Manager:   pnpm 10.30
+
+4.2 Backend (apps/api)
+
+  Framework:         FastAPI 0.109+ (async Python web framework)
+  Server:            uvicorn 0.27+ (ASGI server with hot reload)
+  Models:            Pydantic v2.5+ (data validation and serialization)
+  WebSockets:        websockets 12.0 (real-time bidirectional communication)
+  AI Integration:    anthropic 0.42+ (Claude API SDK)
+  Environment:       python-dotenv 1.0+ (env file loading)
+  Python Version:    3.9+ (uses __future__ annotations for modern typing)
+
+4.3 Infrastructure
+
+  Containerization:  Docker + Docker Compose v3.9
+  Database:          In-memory (development) / PostgreSQL 16 (production via
+                     Docker Compose with asyncpg driver)
+  Concurrency:       concurrently 8.2 (run API + Web dev servers together)
+
+
+────────────────────────────────────────────────────────────────────────────────
+5. DATA MODEL (UNIVERSAL CONTRACT)
+────────────────────────────────────────────────────────────────────────────────
+
+The system uses a "universal contract" — a standardized data schema that works
+across any AI agent framework (OpenClaw, LangChain, custom agents, etc.).
+
+5.1 Run
+
+  A "Run" represents a single end-to-end agent execution. It is the top-level
+  container for all steps.
+
+  Fields:
+    run_id          string (UUID)           Unique identifier
+    created_at      string (ISO 8601)       Creation timestamp
+    updated_at      string (ISO 8601)       Last update timestamp
+    status          enum                    "running" | "completed" | "failed"
+    system_type     enum                    "mock" | "openclaw" | "claude" | "other"
+    root_step_id    string | null           ID of the first step in the DAG
+    metadata        object                  { user_id: string, tags: string[] }
+
+5.2 Step
+
+  A "Step" represents a single unit of work within a run. Steps form a tree
+  (parent-child relationships) that is rendered as a DAG.
+
+  Fields:
+    step_id               string (UUID)       Unique identifier
+    run_id                string (UUID)       Parent run reference
+    parent_step_id        string | null       Parent step (null = root)
+    name                  string              Human-readable step name
+    type                  enum                "llm" | "tool" | "plan" | "final" | "error"
+    status                enum                "running" | "completed" | "failed" | "retrying"
+    started_at            string (ISO 8601)   When the step started
+    ended_at              string | null       When the step finished
+    duration_ms           integer             Processing time in milliseconds
+    tokens_prompt         integer             Prompt/input token count
+    tokens_completion     integer             Completion/output token count
+    cost_usd              float               Estimated cost in USD
+    input                 object              Raw input data (prompts, tool args, etc.)
+    output                object              Raw output data (completions, tool results)
+    error                 object | null       { message, stack, code } if failed
+
+5.3 Step Types
+
+  llm     — An LLM inference call (prompt → completion). Colored BLUE.
+  tool    — A tool/function invocation (API call, file read, web search). Colored PURPLE.
+  plan    — A planning/orchestration step. Colored AMBER.
+  final   — The final output of the workflow. Colored GREEN.
+  error   — A failed step. Colored RED.
+
+5.4 Step Statuses
+
+  running   — Step is currently executing (shown with pulse animation).
+  completed — Step finished successfully.
+  failed    — Step encountered an error.
+  retrying  — Step is being retried after a failure.
+
+
+────────────────────────────────────────────────────────────────────────────────
+6. BACKEND (FastAPI) — DETAILED BREAKDOWN
+────────────────────────────────────────────────────────────────────────────────
+
+6.1 main.py — Application Entrypoint
+
+  The FastAPI app is configured with:
+    - CORS middleware allowing connections from localhost:3000 and all origins
+    - Lifespan context manager for startup/shutdown logging
+    - REST endpoints for CRUD on runs and steps
+    - WebSocket endpoint for real-time per-run subscriptions
+    - Claude-powered analysis and chat endpoints
+
+  REST Endpoints:
+    GET  /api/health                 → { status: "ok", service: "tenor-api" }
+    GET  /api/scenarios              → List of available demo scenarios
+    POST /api/runs                   → Create a new run (optionally with a scenario)
+    GET  /api/runs                   → List recent runs (limit param, default 50)
+    GET  /api/runs/{run_id}          → Get a single run by ID
+    GET  /api/runs/{run_id}/steps    → Get all steps for a run
+    POST /api/steps                  → Create a step manually
+    GET  /api/runs/{run_id}/analyze  → Claude-powered performance analysis
+    GET  /api/steps/{step_id}/summarize → Claude-powered step summary
+    POST /api/chat                   → Send message to Claude optimization advisor
+
+  WebSocket Endpoint:
+    ws://localhost:8000/ws/runs/{run_id}
+      - Clients subscribe to a specific run's updates
+      - Server broadcasts step_update and run_update events in real-time
+      - Supports ping/pong keep-alive
+      - Auto-cleanup of stale connections
+
+6.2 models.py — Pydantic Data Models
+
+  Defines all enums (RunStatus, SystemType, StepType, StepStatus) and core
+  models (Run, Step, RunMetadata, StepError) using Pydantic BaseModel.
+  All models use Field(default_factory=...) for UUIDs and timestamps.
+  Request models: CreateRunRequest, CreateStepRequest.
+
+6.3 database.py — In-Memory Data Store
+
+  A simple dict-based store keyed by run_id and step_id. Provides:
+    - create_run(), get_run(), list_runs(), update_run()
+    - create_step(), get_step(), get_steps_for_run(), update_step()
+  Designed to be swappable with PostgreSQL via async ORM (SQLAlchemy + asyncpg).
+  Instantiated as a module-level singleton.
+
+6.4 websocket_manager.py — WebSocket Room Manager
+
+  Manages WebSocket connections grouped by run_id ("rooms"):
+    - connect(run_id, ws) — Accept and add to room
+    - disconnect(run_id, ws) — Remove from room, cleanup empty rooms
+    - broadcast(run_id, message) — JSON-serialize and send to all room members
+    - Auto-removes stale connections on send failure
+
+6.5 simulator.py — Scenario Simulation Engine
+
+  Walks a ScenarioStep tree and emits steps over time to simulate a real agent:
+    1. Creates a step in "running" status → broadcasts via WebSocket
+    2. Sleeps for the configured delay (simulates processing time)
+    3. Updates the step to "completed" or "failed" → broadcasts again
+    4. Recursively processes child steps
+  Computes costs using configurable per-1K-token rates (GPT-4, Claude 3.5, default).
+
+6.6 scenarios.py — Demo Scenario Definitions
+
+  5 predefined scenario trees, each a nested ScenarioStep dataclass:
+
+  1. flight_booking     — 9 steps: Plan → Search → Analyze → Book → Payment (FAILS)
+                          → Retry Payment (succeeds) → Confirm → Final Output
+                          Demonstrates: error handling, retries, tool calls, LLM reasoning
+
+  2. research_summarizer — 9 steps: Plan → 3 parallel web searches → Extract findings
+                           → Synthesize → Write summary → Final Output
+                           Demonstrates: branching, multi-source aggregation
+
+  3. code_assistant      — 7 steps: Plan → Read source → Read test → Analyze error
+                           → Search docs → Generate fix → Final Output
+                           Demonstrates: code reasoning, file I/O tools
+
+  4. customer_support    — 7 steps: Plan → Lookup customer → Check history → Sentiment
+                           analysis → Generate response → Log interaction → Final Output
+                           Demonstrates: multi-tool orchestration, sentiment analysis
+
+  5. simple_happy        — 3 steps: Plan → Single LLM call → Final Output
+                           Demonstrates: minimal happy path, baseline performance
+
+  Each scenario includes realistic:
+    - Step names and types
+    - Simulated delays (0.4–3.2 seconds)
+    - Token counts (50–2,400 prompt, 30–1,200 completion)
+    - Input/output data (prompts, API args, results)
+    - Error data (payment declined with stack trace)
+
+6.7 chat.py — Claude-Powered Optimization Advisor
+
+  An embedded AI chatbot that:
+    - Receives user messages + optional workflow context (run + steps data)
+    - Uses a detailed system prompt instructing Claude to analyze:
+      parallelization opportunities, cost reduction, latency improvements,
+      error handling, token efficiency, and architecture patterns
+    - Formats workflow data (step count, total tokens, costs, duration, failures)
+      into a structured context block appended to the system prompt
+    - Calls Claude claude-sonnet-4-20250514 via the Anthropic SDK (async)
+    - Returns the optimization advice with token usage stats
+    - Gracefully handles missing API key with setup instructions
+
+6.8 analysis.py — Claude-Powered Performance Analysis
+
+  Two analysis functions:
+
+  analyze_run(run_data, steps_data):
+    - Sends a structured prompt with run statistics and step table to Claude
+    - Claude returns JSON with: summary, token_analysis, cost_analysis,
+      latency_analysis, error_analysis, recommendations[], and score (0–100)
+    - Parses the JSON response, falls back to raw text on parse failure
+
+  summarize_step(step_data):
+    - Sends a single step's input/output data to Claude
+    - Claude returns JSON with: plain_summary, input_summary, output_summary,
+      performance_note (all in plain, non-technical language)
+
+
+────────────────────────────────────────────────────────────────────────────────
+7. FRONTEND (Next.js) — DETAILED BREAKDOWN
+────────────────────────────────────────────────────────────────────────────────
+
+7.1 Pages & Routing (App Router)
+
+  /                     Landing Page (page.tsx)
+                        Beautiful intro with TenorLogo, hero section, animated
+                        gradient background blobs, feature cards grid, CTA button
+                        to /dashboard. Theme toggle in header.
+
+  /dashboard            Main Dashboard (dashboard/page.tsx)
+                        Sidebar + HeroChart (last 10 runs sparkline) +
+                        SummaryStats (5 KPI cards) + AgentCard grid (all runs).
+                        Auto-redirects to first running run if one exists.
+
+  /runs/[runId]         Agent Detail View (runs/[runId]/page.tsx)
+                        Sidebar + DetailHeader + 6-tab interface:
+                        1. Live Trace — React Flow DAG graph
+                        2. Execution Chain — Vertical timeline flowchart
+                        3. Run Explorer — Searchable/filterable table
+                        4. Metrics — Performance metrics dashboard
+                        5. AI Analysis — Claude-powered run analysis
+                        6. AI Optimization — Claude-powered optimization advisor
+                        + StepInspector slide-over panel
+                        + ChatPanel (persistent Claude chat)
+
+7.2 Component Inventory
+
+  BRAND:
+    tenor-logo.tsx          SVG logo with gradient icon (T letterform), animated
+                            dots (cyan, violet, emerald with opacity pulses),
+                            flow lines, and gradient wordmark. Sizes: sm/md/lg/xl.
+                            Also exports TenorIcon for compact spaces.
+
+  LAYOUT:
+    sidebar.tsx             Left sidebar (w-72) with: TenorLogo header, theme toggle,
+                            scenario dropdown launcher (Start Demo Run), recent runs
+                            list with status dots (blue pulse=running, green=completed,
+                            red=failed), run selection highlighting.
+
+    header-stats.tsx        Stats bar showing run duration, total tokens, estimated
+                            cost for the current run.
+
+    theme-toggle.tsx        Dark/light mode toggle button using next-themes.
+
+  DASHBOARD:
+    hero-chart.tsx          SVG sparkline chart showing cost/latency trends across
+                            last 10 runs. Uses theme-aware colors via CSS variables.
+
+    summary-stats.tsx       5 KPI cards: Total Runs, Total Steps, Total Tokens,
+                            Total Cost, Avg Duration. Computed from all runs + steps.
+
+    agent-card.tsx          Individual run card with: status badge, step count,
+                            token usage, cost, latency, miniature sparkline,
+                            click-to-navigate to /runs/{run_id}.
+
+    sparkline.tsx           Tiny inline SVG sparkline component for agent cards.
+
+  DETAIL:
+    detail-header.tsx       Header bar for run detail view with back arrow (→ /dashboard),
+                            run ID, status badge, timing, and stats.
+
+    execution-chain.tsx     Vertical flowchart view of steps. Each step shows type icon,
+                            name, status, duration, tokens, cost. Connected by vertical
+                            lines. Click to open inspector.
+
+    performance-metrics.tsx Dashboard with: ScoreGauge (SVG radial gauge, 0-100),
+                            MetricCards (4 cards: latency, tokens, cost, steps),
+                            step-level breakdown table.
+
+    ai-optimization-advisor.tsx Claude-powered optimization panel. Sends run + steps
+                            data to /api/runs/{id}/analyze endpoint. Displays: summary,
+                            token analysis, cost analysis, latency analysis, error
+                            analysis, recommendations list, optimization score.
+
+  GRAPH:
+    execution-graph.tsx     React Flow canvas rendering the step DAG. Uses dagre for
+                            automatic tree layout. Supports zoom, pan, fit-to-view.
+                            Edges colored by parent step type.
+
+    step-node.tsx           Custom React Flow node component. Shows step name, type icon,
+                            status badge, duration, tokens. Color-coded by type (blue=LLM,
+                            purple=tool, amber=plan, green=final, red=error). Pulse
+                            animation for running steps.
+
+    graph-utils.ts          Helper functions: buildNodesAndEdges() converts Step[] to
+                            React Flow nodes + edges using dagre layout. getLayoutedElements()
+                            applies the dagre algorithm.
+
+  INSPECTOR:
+    step-inspector.tsx      Sheet (slide-over panel) showing full step details:
+                            - Header: name, type badge, status badge, timing
+                            - Tabbed content: Input (JSON), Output (JSON), Error (if any)
+                            - Stats: tokens (prompt + completion), cost, duration
+
+  EXPLORER:
+    run-explorer.tsx        Full-width table of all steps with columns: Name, Type,
+                            Status, Duration, Tokens, Cost. Supports text search
+                            and type/status filter dropdowns. Click row to inspect.
+
+  ANALYSIS:
+    analysis-panel.tsx      Trigger Claude analysis for the current run. Displays
+                            structured results: summary, token/cost/latency analysis,
+                            error analysis, recommendations, score.
+
+  CHAT:
+    chat-panel.tsx          Collapsible right-side panel for chatting with Claude.
+                            Sends conversation history + current run context.
+                            Renders markdown responses. Shows token usage per message.
+
+  UI PRIMITIVES (shadcn/ui):
+    badge.tsx, button.tsx, card.tsx, dropdown-menu.tsx, input.tsx, scroll-area.tsx,
+    select.tsx, separator.tsx, sheet.tsx, skeleton.tsx, table.tsx, tabs.tsx,
+    tooltip.tsx
+    All built on Radix UI primitives with Tailwind + class-variance-authority.
+
+7.3 Custom React Hooks
+
+  use-runs.ts
+    useRuns()       — Fetches all runs, polls every 5s (TanStack Query)
+    useRun(runId)   — Fetches a single run, polls every 3s
+    useScenarios()  — Fetches available demo scenarios
+    useCreateRun()  — Mutation to create a run (invalidates runs cache)
+
+  use-steps.ts
+    useSteps(runId) — Fetches all steps for a run (TanStack Query)
+    useUpsertStep() — Utility to merge WebSocket step updates into cache
+
+  use-websocket.ts
+    useRunWebSocket(runId) — Connects to ws://…/ws/runs/{runId}, handles
+                             step_update and run_update messages, auto-upserts
+                             into TanStack Query cache for instant UI updates
+
+  use-all-run-steps.ts
+    useAllRunSteps(runs) — Parallel-fetches steps for ALL runs (for dashboard).
+                           Uses useQueries() for batch fetching. Running runs
+                           refetch every 3s; completed/failed runs use 30s staleTime.
+                           Returns stepsMap: Record<string, Step[]>.
+
+7.4 Library Utilities
+
+  lib/api.ts
+    REST API client wrapping fetch() for all endpoints:
+    createRun(), listRuns(), getRun(), getRunSteps(), listScenarios(),
+    sendChatMessage(), analyzeRun(), summarizeStep()
+    Base URL from NEXT_PUBLIC_API_URL env var (default: http://localhost:8000)
+
+  lib/websocket.ts
+    RunWebSocket class: WebSocket client with auto-reconnect (2s backoff),
+    ping/pong keep-alive (30s), JSON message parsing, clean disconnect.
+
+  lib/cost.ts
+    computeCost(tokensPrompt, tokensCompletion, model) — mirrors backend cost rates
+    Rates: GPT-4 ($0.03/$0.06 per 1K), Claude 3.5 ($0.003/$0.015), default ($0.01/$0.03)
+
+  lib/utils.ts
+    cn() — className merger (clsx + tailwind-merge)
+    shortId() — Truncate UUID to first 8 chars
+    formatTimestamp() — Format ISO timestamp with date-fns
+
+7.5 Theming System
+
+  The app uses a CSS custom property system defined in globals.css:
+
+  Light mode (:root):
+    --background: white (#ffffff)
+    --foreground: near-black (#09090b)
+    --card: white
+    --border: light gray (#e4e4e7)
+    --muted-foreground: medium gray
+
+  Dark mode (.dark):
+    --background: GitHub dark (#0d1117)
+    --foreground: near-white (#fafafa)
+    --card: dark gray (#161b22)
+    --border: medium gray (#30363d)
+    --muted-foreground: soft gray
+    --ring: cyan (#22d3ee)
+
+  All components use theme-aware Tailwind classes:
+    bg-background, bg-card, border-border, text-foreground, text-muted-foreground
+  This ensures both light and dark modes render correctly without hardcoded colors.
+
+  The ThemeProvider from next-themes uses class-based switching (attribute="class")
+  with dark as the default theme and system preference support enabled.
+
+
+────────────────────────────────────────────────────────────────────────────────
+8. REAL-TIME DATA FLOW
+────────────────────────────────────────────────────────────────────────────────
+
+The real-time pipeline works as follows:
+
+  1. User clicks "Start Demo Run" → selects scenario from dropdown
+  2. Frontend POSTs to /api/runs with { scenario: "flight_booking" }
+  3. Backend creates a Run record, starts asyncio.create_task(run_simulation(...))
+  4. Simulator walks the scenario tree:
+     a. Creates step with status="running" → broadcasts via WebSocket
+     b. Sleeps for configured delay (simulates processing)
+     c. Updates step to status="completed" (or "failed") → broadcasts again
+     d. Recurses into child steps
+  5. Frontend RunWebSocket receives step_update messages
+  6. useUpsertStep() merges into TanStack Query cache (no refetch needed)
+  7. React re-renders: DAG graph grows, nodes change color, stats update
+  8. When all steps are done, run status → "completed", broadcast run_update
+  9. Frontend updates header stats, sidebar status dot, enables analysis
+
+
+────────────────────────────────────────────────────────────────────────────────
+9. AI INTEGRATION (Claude / Anthropic)
+────────────────────────────────────────────────────────────────────────────────
+
+Tenor uses Claude claude-sonnet-4-20250514 for three AI-powered features:
+
+9.1 Optimization Chat Advisor (chat.py)
+  - Persistent chat panel on every page
+  - Context-aware: automatically includes current run's step data
+  - System prompt instructs Claude to analyze parallelization, cost,
+    latency, error handling, token efficiency, and architecture
+  - Responses include specific references to step names, token counts, and costs
+
+9.2 Run Performance Analysis (analysis.py → analyze_run)
+  - One-click analysis from the "AI Analysis" tab
+  - Claude produces a structured JSON report with 7 fields:
+    summary, token_analysis, cost_analysis, latency_analysis,
+    error_analysis, recommendations[], score (0–100)
+  - Score rating: 90-100 Excellent, 70-89 Good, 50-69 Fair, 0-49 Needs Work
+
+9.3 Step Summarization (analysis.py → summarize_step)
+  - Translates raw step I/O into plain-English explanations
+  - Claude produces: plain_summary, input_summary, output_summary, performance_note
+  - Accessible per-step from the inspector panel
+
+All AI features require the ANTHROPIC_API_KEY environment variable to be set.
+If missing, the system gracefully degrades with setup instructions instead of errors.
+
+
+────────────────────────────────────────────────────────────────────────────────
+10. UI/UX DESIGN DETAILS
+────────────────────────────────────────────────────────────────────────────────
+
+10.1 Landing Page
+  - Full-viewport hero with animated gradient background blobs (cyan, violet, emerald)
+  - Subtle SVG grid pattern overlay
+  - TenorLogo (xl size) with animated pulsing dots
+  - Tagline: "See every step your AI agents take"
+  - Subtitle: "Real-time observability for the agentic era"
+  - 4 feature cards with colored icons (GitBranch, BarChart3, Bot, Eye)
+  - CTA button: "Open Dashboard →"
+  - Theme toggle in header
+
+10.2 Dashboard
+  - Left sidebar with run list and scenario launcher
+  - Hero sparkline chart showing cost/latency trends
+  - 5 summary KPI cards with computed aggregates
+  - Responsive grid of agent cards (1/2/3/4 columns by breakpoint)
+  - Each card shows: scenario name, status, step count, tokens, cost, sparkline
+  - Empty state with setup instructions
+
+10.3 Detail View
+  - Compact header with back navigation, run ID, status, timing
+  - 6 tabs for different views of the same run data
+  - Live Trace: React Flow DAG with zoom/pan/fit, node clicking
+  - Execution Chain: Vertical timeline with connector lines
+  - Run Explorer: Searchable/sortable table
+  - Metrics: Score gauge + 4 metric cards + step breakdown
+  - AI Analysis: Structured Claude report
+  - AI Optimization: Claude optimization advisor
+  - Inspector: Slide-over panel with tabbed JSON viewer
+  - Chat: Collapsible right panel
+
+10.4 Color Coding
+  - LLM steps: Blue (#3b82f6) — inferencing calls
+  - Tool steps: Purple (#8b5cf6) — external tool invocations
+  - Plan steps: Amber (#f59e0b) — orchestration/planning
+  - Final steps: Green (#22c55e) — successful completion
+  - Error steps: Red (#ef4444) — failures
+  - Running status: Blue pulse animation
+  - Retrying status: Orange (#f97316)
+
+10.5 Responsive & Accessible
+  - Sidebar collapses on small screens
+  - Cards reflow from 4 → 3 → 2 → 1 column
+  - Keyboard-navigable (Radix UI accessibility)
+  - Skeleton loaders during data fetching
+  - Empty states with helpful guidance
+
+
+────────────────────────────────────────────────────────────────────────────────
+11. DEPLOYMENT & INFRASTRUCTURE
+────────────────────────────────────────────────────────────────────────────────
+
+11.1 Development
+
+  # Install all dependencies
+  pnpm install
+  cd apps/api && pip install -r requirements.txt
+
+  # Start both servers (API + Web)
+  pnpm dev
+  # → API: http://localhost:8000
+  # → Web: http://localhost:3000
+
+  # Set Anthropic API key for AI features
+  echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
+
+11.2 Docker Compose (Production-like)
+
+  docker-compose up --build
+
+  Services:
+    - postgres: PostgreSQL 16 Alpine (port 5432)
+    - api: FastAPI app (port 8000), depends on postgres
+    - web: Next.js app (port 3000), depends on api
+
+  Environment variables:
+    API:  DATABASE_URL=postgresql+asyncpg://uaop:uaop_dev@postgres:5432/uaop
+          CORS_ORIGINS=http://localhost:3000
+    Web:  NEXT_PUBLIC_API_URL=http://localhost:8000
+          NEXT_PUBLIC_WS_URL=ws://localhost:8000
+
+11.3 Environment Variables
+
+  ANTHROPIC_API_KEY       Required for AI features (chat, analysis, summarization)
+  NEXT_PUBLIC_API_URL     Frontend → Backend REST URL (default: http://localhost:8000)
+  NEXT_PUBLIC_WS_URL      Frontend → Backend WebSocket URL (default: ws://localhost:8000)
+  DATABASE_URL            PostgreSQL connection string (Docker Compose only)
+  CORS_ORIGINS            Allowed CORS origins (Docker Compose only)
+
+
+────────────────────────────────────────────────────────────────────────────────
+12. DEMO SCENARIOS IN DETAIL
+────────────────────────────────────────────────────────────────────────────────
+
+12.1 Flight Booking Agent (flight_booking)
+  Simulates an end-to-end flight booking with error recovery.
+  Steps: Plan → Search Flights (tool) → Analyze Options (LLM) → Book (tool)
+         → Payment FAILS (tool/error) → Retry Payment (tool) → Confirm (LLM)
+         → Final Output
+  Total: 9 steps, ~1,720 prompt tokens, ~750 completion tokens
+  Highlights: Payment failure with stack trace, retry with backup card
+
+12.2 Research Summarizer (research_summarizer)
+  Simulates multi-source research aggregation.
+  Steps: Plan → 3 Web Searches (tools) → Extract per source (LLM ×3)
+         → Synthesize All (LLM) → Write Summary (LLM) → Final Output
+  Total: 9 steps, ~8,630 prompt tokens, ~3,350 completion tokens
+  Highlights: Branching execution, parallel-capable steps
+
+12.3 Code Debug Assistant (code_assistant)
+  Simulates debugging a Python TypeError.
+  Steps: Plan → Read Source (tool) → Read Test (tool) → Analyze Error (LLM)
+         → Search Docs (tool) → Generate Fix (LLM) → Final Output
+  Total: 7 steps, ~3,430 prompt tokens, ~1,470 completion tokens
+  Highlights: File I/O tools, code analysis, fix generation
+
+12.4 Customer Support (customer_support)
+  Simulates handling a billing dispute.
+  Steps: Plan → Lookup Customer (tool) → Check History (tool) → Sentiment
+         Analysis (LLM) → Generate Response (LLM) → Log Interaction (tool)
+         → Final Output
+  Total: 7 steps, ~3,030 prompt tokens, ~1,330 completion tokens
+  Highlights: Multi-tool orchestration, sentiment classification
+
+12.5 Simple Happy Path (simple_happy)
+  Minimal scenario for baseline testing.
+  Steps: Plan → Single LLM Call → Final Output
+  Total: 3 steps, ~630 prompt tokens, ~280 completion tokens
+  Highlights: Fast execution, no errors, clean DAG
+
+
+────────────────────────────────────────────────────────────────────────────────
+13. KEY DESIGN DECISIONS
+────────────────────────────────────────────────────────────────────────────────
+
+  1. Universal Contract: The Run/Step data model is framework-agnostic, allowing
+     Tenor to observe any agent system that emits steps in this format.
+
+  2. In-Memory Store: Development simplicity. The Database class interface is
+     designed for drop-in replacement with SQLAlchemy + PostgreSQL.
+
+  3. WebSocket per Run: Clients subscribe to individual run rooms, minimizing
+     unnecessary broadcasts. The ConnectionManager handles room lifecycle.
+
+  4. Simulation Engine: Instead of requiring a real agent, the simulator walks
+     predefined scenario trees with realistic delays, token counts, and errors.
+     This enables instant demos without external API costs.
+
+  5. CSS Variable Theming: All colors go through Tailwind CSS custom properties
+     rather than hardcoded hex values, enabling seamless light/dark switching.
+
+  6. TanStack Query Cache: WebSocket updates are merged directly into the query
+     cache, providing instant UI updates without re-fetching from the API.
+
+  7. dagre Layout: Automatic DAG layout ensures the graph is always readable
+     regardless of the number of steps or tree depth.
+
+  8. Claude Integration: Using claude-sonnet-4-20250514 for all AI features, with async
+     calls and graceful degradation when the API key is not configured.
+
+  9. Monorepo with pnpm Workspaces: Single repository, shared tooling, independent
+     deployment of frontend and backend.
+
+  10. Next.js App Router: Leverages React Server Components, nested layouts,
+      and file-based routing for clean code organization.
+
+
+────────────────────────────────────────────────────────────────────────────────
+14. FUTURE ROADMAP / EXTENSION POINTS
+────────────────────────────────────────────────────────────────────────────────
+
+  - PostgreSQL persistence with SQLAlchemy async ORM
+  - Real agent integrations (LangChain, CrewAI, AutoGen adapters)
+  - Multi-user authentication and workspace isolation
+  - Run comparison view (diff two runs side by side)
+  - Cost budgets and alerting (Slack/email notifications)
+  - Step-level caching recommendations (detect repeated identical LLM calls)
+  - Export runs as JSON/CSV for external analysis
+  - Prometheus metrics endpoint for platform monitoring
+  - Deployment to Vercel (frontend) + Railway/Fly.io (backend)
+
+
+================================================================================
+                                  END OF DOCUMENT
+================================================================================

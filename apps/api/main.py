@@ -21,6 +21,7 @@ from simulator import run_simulation
 from scenarios import SCENARIOS, SCENARIO_LABELS
 from chat import ChatRequest, get_chat_response
 from analysis import analyze_run, summarize_step
+from optimization import router as optimization_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,6 +30,13 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Tenor API starting up")
+    # Load CSV data for the optimization analytics engine
+    from analytics_engine import load_csv_data
+    import os
+    data_dir = os.path.join(os.path.dirname(__file__), "data")
+    if os.path.isdir(data_dir):
+        load_csv_data(data_dir)
+        logger.info("Loaded optimization CSV data from %s", data_dir)
     yield
     logger.info("Tenor API shutting down")
 
@@ -48,6 +56,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+app.include_router(optimization_router)
 
 # ── REST Endpoints ─────────────────────────────────────────────────────────────
 
