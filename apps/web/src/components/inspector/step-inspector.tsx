@@ -51,7 +51,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <Button variant="ghost" size="icon" className="h-6 w-6" onClick={copy}>
       {copied ? (
-        <Check className="h-3 w-3 text-green-400" />
+        <Check className="h-3 w-3 text-zinc-400" />
       ) : (
         <Copy className="h-3 w-3" />
       )}
@@ -206,7 +206,7 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-violet-400" />
+                  <Sparkles className="h-4 w-4 text-foreground" />
                   <span className="text-sm font-semibold">AI Summary</span>
                 </div>
                 {!aiSummary && (
@@ -230,10 +230,10 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
               {aiSummary ? (
                 <div className="space-y-3">
                   {/* Plain summary */}
-                  <div className="rounded-lg bg-violet-500/5 border border-violet-500/20 p-3">
+                  <div className="rounded-lg bg-zinc-500/5 border border-zinc-500/20 p-3">
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <BookOpen className="h-3 w-3 text-violet-400" />
-                      <span className="text-[11px] font-medium text-violet-400 uppercase tracking-wider">
+                      <BookOpen className="h-3 w-3 text-zinc-400" />
+                      <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">
                         What happened
                       </span>
                     </div>
@@ -243,10 +243,10 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
                   </div>
 
                   {/* Input summary */}
-                  <div className="rounded-lg bg-blue-500/5 border border-blue-500/20 p-3">
+                  <div className="rounded-lg bg-zinc-500/5 border border-zinc-500/20 p-3">
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <ArrowDownToLine className="h-3 w-3 text-blue-400" />
-                      <span className="text-[11px] font-medium text-blue-400 uppercase tracking-wider">
+                      <ArrowDownToLine className="h-3 w-3 text-zinc-400" />
+                      <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">
                         Input
                       </span>
                     </div>
@@ -256,10 +256,10 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
                   </div>
 
                   {/* Output summary */}
-                  <div className="rounded-lg bg-green-500/5 border border-green-500/20 p-3">
+                  <div className="rounded-lg bg-zinc-500/5 border border-zinc-500/20 p-3">
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <ArrowUpFromLine className="h-3 w-3 text-green-400" />
-                      <span className="text-[11px] font-medium text-green-400 uppercase tracking-wider">
+                      <ArrowUpFromLine className="h-3 w-3 text-zinc-400" />
+                      <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">
                         Output
                       </span>
                     </div>
@@ -269,10 +269,10 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
                   </div>
 
                   {/* Performance note */}
-                  <div className="rounded-lg bg-amber-500/5 border border-amber-500/20 p-3">
+                  <div className="rounded-lg bg-zinc-500/5 border border-zinc-500/20 p-3">
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <Gauge className="h-3 w-3 text-amber-400" />
-                      <span className="text-[11px] font-medium text-amber-400 uppercase tracking-wider">
+                      <Gauge className="h-3 w-3 text-zinc-400" />
+                      <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">
                         Performance
                       </span>
                     </div>
@@ -327,7 +327,7 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
                       <div className="absolute right-2 top-2">
                         <CopyButton text={String(step.input.prompt)} />
                       </div>
-                      <div className="rounded-md bg-blue-500/5 border border-blue-500/20 p-3 text-sm whitespace-pre-wrap max-h-48 overflow-y-auto">
+                      <div className="rounded-md bg-zinc-500/5 border border-zinc-500/20 p-3 text-sm whitespace-pre-wrap max-h-48 overflow-y-auto">
                         {String(step.input.prompt)}
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
                       <div className="absolute right-2 top-2">
                         <CopyButton text={String(step.output.completion)} />
                       </div>
-                      <div className="rounded-md bg-green-500/5 border border-green-500/20 p-3 text-sm whitespace-pre-wrap max-h-48 overflow-y-auto">
+                      <div className="rounded-md bg-zinc-500/5 border border-zinc-500/20 p-3 text-sm whitespace-pre-wrap max-h-48 overflow-y-auto">
                         {String(step.output.completion)}
                       </div>
                     </div>
@@ -359,7 +359,7 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
                     <p className="text-xs font-medium text-muted-foreground">
                       Tool Name
                     </p>
-                    <code className="rounded bg-purple-500/10 px-2 py-1 text-sm text-purple-400">
+                    <code className="rounded bg-zinc-500/10 px-2 py-1 text-sm text-zinc-300">
                       {String(step.input.tool)}
                     </code>
                   </div>
@@ -375,7 +375,7 @@ export function StepInspector({ step, open, onOpenChange }: StepInspectorProps) 
                           text={JSON.stringify(step.input.args, null, 2)}
                         />
                       </div>
-                      <pre className="rounded-md bg-purple-500/5 border border-purple-500/20 p-3 text-xs font-mono overflow-x-auto max-h-32 overflow-y-auto">
+                      <pre className="rounded-md bg-zinc-500/5 border border-zinc-500/20 p-3 text-xs font-mono overflow-x-auto max-h-32 overflow-y-auto">
                         {JSON.stringify(step.input.args, null, 2)}
                       </pre>
                     </div>

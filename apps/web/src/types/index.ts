@@ -82,16 +82,16 @@ export interface ScenariosResponse {
 // ─── Node coloring map ──────────────────────────────────────────────────────
 
 export const STEP_TYPE_COLORS: Record<StepType, string> = {
-  llm: "#3b82f6",       // Blue
-  tool: "#8b5cf6",      // Purple
+  llm: "#e4e4e7",       // Zinc-200
+  tool: "#a1a1aa",      // Zinc-400
   error: "#ef4444",     // Red
-  final: "#22c55e",     // Green
-  plan: "#f59e0b",      // Amber
+  final: "#fafafa",     // White
+  plan: "#71717a",      // Zinc-500
 };
 
 export const STEP_STATUS_COLORS: Record<StepStatus, string> = {
-  running: "#3b82f6",
-  completed: "#22c55e",
+  running: "#d4d4d8",
+  completed: "#a1a1aa",
   failed: "#ef4444",
-  retrying: "#f97316",
+  retrying: "#71717a",
 };

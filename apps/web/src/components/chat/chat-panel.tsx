@@ -114,8 +114,8 @@ export function ChatPanel({ runId, className }: ChatPanelProps) {
         onClick={() => setIsOpen(true)}
         className={cn(
           "fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg",
-          "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700",
-          "text-white",
+          "bg-foreground hover:bg-foreground/90",
+          "text-background",
           className
         )}
         size="icon"
@@ -137,8 +137,8 @@ export function ChatPanel({ runId, className }: ChatPanelProps) {
       {/* Header */}
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600">
-            <Sparkles className="h-4 w-4 text-white" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground">
+            <Sparkles className="h-4 w-4 text-background" />
           </div>
           <div>
             <h3 className="text-sm font-semibold">Workflow Advisor</h3>
@@ -206,8 +206,8 @@ export function ChatPanel({ runId, className }: ChatPanelProps) {
               )}
             >
               {msg.role === "assistant" && (
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-indigo-600">
-                  <Bot className="h-3.5 w-3.5 text-white" />
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-foreground">
+                  <Bot className="h-3.5 w-3.5 text-background" />
                 </div>
               )}
               <div
@@ -232,8 +232,8 @@ export function ChatPanel({ runId, className }: ChatPanelProps) {
 
           {isLoading && (
             <div className="flex gap-2">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-indigo-600">
-                <Bot className="h-3.5 w-3.5 text-white" />
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-foreground">
+                <Bot className="h-3.5 w-3.5 text-background" />
               </div>
               <div className="rounded-lg bg-muted px-3 py-2">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />

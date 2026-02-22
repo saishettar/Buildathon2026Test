@@ -82,8 +82,8 @@ export function DetailHeader({ run, steps, isLoading }: DetailHeaderProps) {
         <StatusIcon
           className={cn(
             "h-4 w-4",
-            run.status === "running" && "animate-spin text-blue-400",
-            run.status === "completed" && "text-cyan-400",
+            run.status === "running" && "animate-spin text-zinc-300",
+            run.status === "completed" && "text-zinc-400",
             run.status === "failed" && "text-red-400"
           )}
         />
@@ -117,7 +117,7 @@ export function DetailHeader({ run, steps, isLoading }: DetailHeaderProps) {
           </span>
           <span className="flex items-center gap-1">
             <Coins className="h-3 w-3 text-muted-foreground/60" />
-            <span className="text-emerald-400 font-medium">{formatCost(stats.totalCost)}</span>
+            <span className="text-foreground font-medium">{formatCost(stats.totalCost)}</span>
           </span>
         </div>
       )}

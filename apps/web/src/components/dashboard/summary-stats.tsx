@@ -64,7 +64,7 @@ export function SummaryStats({ runs, stepsMap }: SummaryStatsProps) {
         value: totalRuns.toString(),
         subValue: `${runningRuns} active`,
         icon: Activity,
-        color: "text-cyan-400",
+        color: "text-foreground",
         trend: "neutral" as const,
       },
       {
@@ -72,7 +72,7 @@ export function SummaryStats({ runs, stepsMap }: SummaryStatsProps) {
         value: `${overallSuccessRate}%`,
         subValue: `${completedRuns}/${totalRuns} runs`,
         icon: TrendingUp,
-        color: overallSuccessRate >= 80 ? "text-emerald-400" : overallSuccessRate >= 50 ? "text-amber-400" : "text-red-400",
+        color: overallSuccessRate >= 80 ? "text-foreground" : overallSuccessRate >= 50 ? "text-zinc-400" : "text-red-400",
         trend: overallSuccessRate >= 80 ? "up" as const : "down" as const,
       },
       {
@@ -80,7 +80,7 @@ export function SummaryStats({ runs, stepsMap }: SummaryStatsProps) {
         value: formatDuration(avgLatency),
         subValue: `${totalSteps} total steps`,
         icon: Zap,
-        color: "text-violet-400",
+        color: "text-zinc-300",
         trend: "neutral" as const,
       },
       {
@@ -88,7 +88,7 @@ export function SummaryStats({ runs, stepsMap }: SummaryStatsProps) {
         value: formatCost(totalCostUsd),
         subValue: `${totalTokens > 1000 ? `${(totalTokens / 1000).toFixed(1)}k` : totalTokens} tokens`,
         icon: Coins,
-        color: "text-emerald-400",
+        color: "text-foreground",
         trend: "neutral" as const,
       },
       {
@@ -96,7 +96,7 @@ export function SummaryStats({ runs, stepsMap }: SummaryStatsProps) {
         value: failedRuns.toString(),
         subValue: `${totalRuns > 0 ? Math.round((failedRuns / totalRuns) * 100) : 0}% error rate`,
         icon: failedRuns > 0 ? AlertTriangle : CheckCircle2,
-        color: failedRuns > 0 ? "text-red-400" : "text-emerald-400",
+        color: failedRuns > 0 ? "text-red-400" : "text-zinc-400",
         trend: failedRuns > 0 ? "down" as const : "up" as const,
       },
     ];

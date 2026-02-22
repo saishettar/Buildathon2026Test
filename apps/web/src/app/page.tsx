@@ -25,29 +25,29 @@ const FEATURES = [
     icon: GitBranch,
     title: "Live Execution Traces",
     description: "Watch AI agent workflows execute in real-time with interactive DAG visualizations.",
-    color: "text-cyan-400",
-    bg: "bg-cyan-500/10",
+    color: "text-foreground",
+    bg: "bg-foreground/10",
   },
   {
     icon: BarChart3,
     title: "Performance Metrics",
     description: "Token usage, cost analysis, latency percentiles, and health scores at a glance.",
-    color: "text-violet-400",
-    bg: "bg-violet-500/10",
+    color: "text-zinc-400",
+    bg: "bg-zinc-500/10",
   },
   {
     icon: Bot,
     title: "AI-Powered Analysis",
     description: "Claude-powered insights that analyze your agent runs and suggest optimizations.",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10",
+    color: "text-zinc-300",
+    bg: "bg-zinc-400/10",
   },
   {
     icon: Eye,
     title: "Step-Level Inspection",
     description: "Drill into every LLM call, tool invocation, prompt, completion, and error detail.",
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
+    color: "text-zinc-500",
+    bg: "bg-zinc-600/10",
   },
 ];
 
@@ -58,9 +58,9 @@ export default function LandingPage() {
     <div className="relative min-h-screen bg-background text-foreground overflow-hidden">
       {/* Animated background pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[400px] -right-[400px] w-[800px] h-[800px] rounded-full bg-cyan-500/[0.03] dark:bg-cyan-500/[0.04] blur-3xl" />
-        <div className="absolute -bottom-[300px] -left-[300px] w-[700px] h-[700px] rounded-full bg-violet-500/[0.03] dark:bg-violet-500/[0.04] blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-emerald-500/[0.02] dark:bg-emerald-500/[0.02] blur-3xl" />
+        <div className="absolute -top-[400px] -right-[400px] w-[800px] h-[800px] rounded-full bg-zinc-500/[0.03] dark:bg-zinc-500/[0.06] blur-3xl" />
+        <div className="absolute -bottom-[300px] -left-[300px] w-[700px] h-[700px] rounded-full bg-zinc-400/[0.03] dark:bg-zinc-400/[0.05] blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-zinc-600/[0.02] dark:bg-zinc-600/[0.03] blur-3xl" />
 
         {/* Subtle grid */}
         <svg className="absolute inset-0 w-full h-full opacity-[0.03] dark:opacity-[0.04]" xmlns="http://www.w3.org/2000/svg">
@@ -84,7 +84,7 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto text-center space-y-8">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 backdrop-blur-sm px-4 py-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+            <Sparkles className="h-3.5 w-3.5 text-foreground" />
             <span className="text-xs font-medium text-muted-foreground">
               AI Agent Observability Platform
             </span>
@@ -98,7 +98,7 @@ export default function LandingPage() {
           {/* Tagline */}
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground leading-tight">
             See every step your{" "}
-            <span className="bg-gradient-to-r from-cyan-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="text-foreground font-extrabold">
               AI agents
             </span>{" "}
             take
@@ -114,7 +114,7 @@ export default function LandingPage() {
             <Button
               size="lg"
               onClick={() => router.push("/dashboard")}
-              className="gap-2 bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-600 hover:to-violet-600 text-white border-0 shadow-lg shadow-cyan-500/20 px-8 h-12 text-base"
+              className="gap-2 bg-foreground hover:bg-foreground/90 text-background border-0 shadow-lg shadow-foreground/10 px-8 h-12 text-base"
             >
               Launch Dashboard
               <ArrowRight className="h-4 w-4" />
@@ -130,7 +130,7 @@ export default function LandingPage() {
               return (
                 <div
                   key={feature.title}
-                  className="group rounded-xl border border-border bg-card/50 backdrop-blur-sm p-6 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/5"
+                  className="group rounded-xl border border-border bg-card/50 backdrop-blur-sm p-6 transition-all duration-300 hover:border-zinc-500/30 hover:shadow-lg hover:shadow-zinc-500/5"
                 >
                   <div className="flex items-start gap-4">
                     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${feature.bg}`}>

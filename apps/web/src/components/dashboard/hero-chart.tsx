@@ -75,28 +75,28 @@ export function HeroChart({ runs, stepsMap }: HeroChartProps) {
     const metricseries: MetricSeries[] = [
       {
         name: "Success Rate",
-        color: "#22d3ee",
+        color: "#fafafa",
         data: successRateData,
         currentValue: `${lastSuccessRate}%`,
         unit: "%",
       },
       {
         name: "Avg Latency",
-        color: "#a78bfa",
+        color: "#a1a1aa",
         data: avgLatencyData,
         currentValue: `${lastLatency}ms`,
         unit: "ms",
       },
       {
         name: "Total Steps",
-        color: "#34d399",
+        color: "#71717a",
         data: stepsCountData,
         currentValue: `${lastSteps}`,
         unit: "",
       },
       {
         name: "Token Usage",
-        color: "#fbbf24",
+        color: "#52525b",
         data: tokenUsageData,
         currentValue: lastTokens > 1000 ? `${(lastTokens / 1000).toFixed(1)}k` : `${lastTokens}`,
         unit: "tok",
@@ -258,7 +258,7 @@ export function HeroChart({ runs, stepsMap }: HeroChartProps) {
                 y1={padding.top}
                 x2={padding.left + (hoveredIndex / Math.max(timeLabels.length - 1, 1)) * innerWidth}
                 y2={padding.top + innerHeight}
-                stroke="#22d3ee"
+                stroke="#a1a1aa"
                 strokeWidth={1}
                 strokeOpacity={0.3}
                 strokeDasharray="4 4"
@@ -269,7 +269,7 @@ export function HeroChart({ runs, stepsMap }: HeroChartProps) {
           {/* Timeline Brush Bar */}
           <div className="mt-2 mx-12">
             <div className="relative h-6 rounded-full bg-background border border-border overflow-hidden">
-              <div className="absolute inset-y-0 left-[10%] right-[10%] bg-cyan-500/10 border-l border-r border-cyan-500/30 rounded" />
+              <div className="absolute inset-y-0 left-[10%] right-[10%] bg-zinc-500/10 border-l border-r border-zinc-500/30 rounded" />
               <div className="flex justify-between px-2 h-full items-center">
                 {["0%", "25%", "50%", "75%", "100%"].map((label) => (
                   <span key={label} className="text-[8px] text-muted-foreground/60 font-mono">

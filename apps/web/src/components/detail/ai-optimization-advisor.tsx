@@ -206,13 +206,13 @@ export function AIOptimizationAdvisor({ run, steps }: AIOptimizationAdvisorProps
 
   const impactColors = {
     high: "text-red-400 bg-red-500/10 border-red-500/20",
-    medium: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-    low: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+    medium: "text-zinc-300 bg-zinc-400/10 border-zinc-400/20",
+    low: "text-zinc-400 bg-zinc-500/10 border-zinc-500/20",
   };
 
   const effortColors = {
-    low: "text-emerald-400",
-    medium: "text-amber-400",
+    low: "text-zinc-400",
+    medium: "text-zinc-300",
     high: "text-red-400",
   };
 
@@ -221,8 +221,8 @@ export function AIOptimizationAdvisor({ run, steps }: AIOptimizationAdvisorProps
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 border border-violet-500/20">
-            <Sparkles className="h-6 w-6 text-violet-400" />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-zinc-800 border border-zinc-700">
+            <Sparkles className="h-6 w-6 text-foreground" />
           </div>
           <div>
             <h3 className="text-base font-semibold text-foreground">AI Optimization Advisor</h3>
@@ -237,7 +237,7 @@ export function AIOptimizationAdvisor({ run, steps }: AIOptimizationAdvisorProps
         {/* ── Actionable Suggestions ──────────────────────────────────── */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Lightbulb className="h-4 w-4 text-amber-400" />
+            <Lightbulb className="h-4 w-4 text-foreground" />
             <h4 className="text-sm font-semibold text-foreground/80">Optimization Suggestions</h4>
             <Badge variant="outline" className="text-[10px] ml-auto">
               {suggestions.length} suggestions
@@ -257,7 +257,7 @@ export function AIOptimizationAdvisor({ run, steps }: AIOptimizationAdvisorProps
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-card">
-                      <Icon className="h-4 w-4 text-cyan-400" />
+                      <Icon className="h-4 w-4 text-zinc-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -287,7 +287,7 @@ export function AIOptimizationAdvisor({ run, steps }: AIOptimizationAdvisorProps
         {/* ── Recommended Agents ────────────────────────────────────── */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Bot className="h-4 w-4 text-cyan-400" />
+            <Bot className="h-4 w-4 text-foreground" />
             <h4 className="text-sm font-semibold text-foreground/80">Recommended Agents</h4>
             {/* NOTE: Placeholder data — will be wired to actual AI recommendations later */}
           </div>
@@ -298,24 +298,24 @@ export function AIOptimizationAdvisor({ run, steps }: AIOptimizationAdvisorProps
                 key={i}
                 className={cn(
                   "rounded-lg border border-border bg-background p-4 space-y-2",
-                  "hover:border-cyan-500/30 transition-colors cursor-pointer"
+                  "hover:border-zinc-500/30 transition-colors cursor-pointer"
                 )}
               >
                 <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/10">
-                    <Bot className="h-3.5 w-3.5 text-cyan-400" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-500/10">
+                    <Bot className="h-3.5 w-3.5 text-zinc-400" />
                   </div>
                   <h5 className="text-xs font-semibold text-foreground">{agent.name}</h5>
                 </div>
                 <p className="text-[11px] text-muted-foreground">{agent.reason}</p>
                 <div className="flex items-center gap-3 pt-1">
                   <div className="flex items-center gap-1">
-                    <CheckCircle2 className="h-3 w-3 text-emerald-400" />
-                    <span className="text-[10px] text-emerald-400 font-medium">{agent.successRate}%</span>
+                    <CheckCircle2 className="h-3 w-3 text-zinc-400" />
+                    <span className="text-[10px] text-zinc-400 font-medium">{agent.successRate}%</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <DollarSign className="h-3 w-3 text-amber-400" />
-                    <span className="text-[10px] text-amber-400 font-medium">{agent.avgCost}</span>
+                    <DollarSign className="h-3 w-3 text-zinc-400" />
+                    <span className="text-[10px] text-zinc-400 font-medium">{agent.avgCost}</span>
                   </div>
                 </div>
               </div>
@@ -328,7 +328,7 @@ export function AIOptimizationAdvisor({ run, steps }: AIOptimizationAdvisorProps
         {/* ── Automation Suggestions ──────────────────────────────────── */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-violet-400" />
+            <Zap className="h-4 w-4 text-foreground" />
             <h4 className="text-sm font-semibold text-foreground/80">Automation Suggestions</h4>
             {/* NOTE: Placeholder data — will be wired to actual AI automation logic later */}
           </div>
@@ -344,8 +344,8 @@ export function AIOptimizationAdvisor({ run, steps }: AIOptimizationAdvisorProps
                     "hover:border-muted-foreground/30 transition-colors"
                   )}
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-500/10">
-                    <Icon className="h-4 w-4 text-violet-400" />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-500/10">
+                    <Icon className="h-4 w-4 text-zinc-400" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">

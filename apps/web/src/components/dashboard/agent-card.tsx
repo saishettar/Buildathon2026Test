@@ -35,14 +35,14 @@ interface AgentCardProps {
 const STATUS_CONFIG: Record<RunStatus, { icon: React.ElementType; color: string; dotColor: string; label: string }> = {
   running: {
     icon: Loader2,
-    color: "text-blue-400",
-    dotColor: "bg-blue-400",
+    color: "text-zinc-300",
+    dotColor: "bg-zinc-300",
     label: "Running",
   },
   completed: {
     icon: CheckCircle2,
-    color: "text-cyan-400",
-    dotColor: "bg-cyan-400",
+    color: "text-zinc-400",
+    dotColor: "bg-zinc-400",
     label: "Completed",
   },
   failed: {
@@ -93,8 +93,8 @@ export function AgentCard({ run, steps }: AgentCardProps) {
     run.status === "failed"
       ? "#ef4444"
       : run.status === "running"
-      ? "#3b82f6"
-      : "#22d3ee";
+      ? "#d4d4d8"
+      : "#a1a1aa";
 
   // Determine the scenario / agent name from the run metadata tags
   const agentName = useMemo(() => {
@@ -113,19 +113,19 @@ export function AgentCard({ run, steps }: AgentCardProps) {
       onClick={() => router.push(`/runs/${run.run_id}`)}
       className={cn(
         "group relative w-full rounded-xl border text-left transition-all duration-200",
-        "bg-card border-border hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/5",
-        "focus:outline-none focus:ring-2 focus:ring-cyan-500/40",
+        "bg-card border-border hover:border-zinc-500/40 hover:shadow-lg hover:shadow-zinc-500/5",
+        "focus:outline-none focus:ring-2 focus:ring-zinc-400/40",
         run.status === "failed" && "border-red-500/30 hover:border-red-500/50",
-        run.status === "running" && "border-blue-500/30 hover:border-blue-500/50"
+        run.status === "running" && "border-zinc-500/30 hover:border-zinc-400/50"
       )}
     >
       {/* Status indicator bar at top */}
       <div
         className={cn(
           "absolute top-0 left-4 right-4 h-[2px] rounded-b-full opacity-60 group-hover:opacity-100 transition-opacity",
-          run.status === "completed" && "bg-cyan-400",
+          run.status === "completed" && "bg-zinc-400",
           run.status === "failed" && "bg-red-400",
-          run.status === "running" && "bg-blue-400"
+          run.status === "running" && "bg-zinc-300"
         )}
       />
 
@@ -184,7 +184,7 @@ export function AgentCard({ run, steps }: AgentCardProps) {
             <span
               className={cn(
                 "text-[11px] font-medium ml-auto",
-                stats.successRate >= 80 ? "text-cyan-400" : stats.successRate >= 50 ? "text-amber-400" : "text-red-400"
+                stats.successRate >= 80 ? "text-foreground" : stats.successRate >= 50 ? "text-zinc-400" : "text-red-400"
               )}
             >
               {stats.successRate}%
@@ -207,7 +207,7 @@ export function AgentCard({ run, steps }: AgentCardProps) {
           <div className="flex items-center gap-1.5 col-span-2">
             <Coins className="h-3 w-3 text-muted-foreground" />
             <span className="text-[11px] text-muted-foreground">Cost</span>
-            <span className="text-[11px] font-medium text-emerald-400 ml-auto">
+            <span className="text-[11px] font-medium text-foreground ml-auto">
               {formatCost(stats.totalCost)}
             </span>
           </div>

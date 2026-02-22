@@ -76,27 +76,27 @@ export default function RunPage() {
         <Tabs defaultValue="trace" className="flex flex-1 flex-col min-h-0">
           <div className="border-b border-border px-4 bg-card">
             <TabsList className="h-10 bg-transparent">
-              <TabsTrigger value="trace" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-cyan-400">
+              <TabsTrigger value="trace" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <GitBranch className="h-3.5 w-3.5" />
                 Live Trace
               </TabsTrigger>
-              <TabsTrigger value="chain" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-cyan-400">
+              <TabsTrigger value="chain" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <Link2 className="h-3.5 w-3.5" />
                 Execution Chain
               </TabsTrigger>
-              <TabsTrigger value="explorer" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-cyan-400">
+              <TabsTrigger value="explorer" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <Table2 className="h-3.5 w-3.5" />
                 Run Explorer
               </TabsTrigger>
-              <TabsTrigger value="metrics" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-cyan-400">
+              <TabsTrigger value="metrics" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <BarChart3 className="h-3.5 w-3.5" />
                 Metrics
               </TabsTrigger>
-              <TabsTrigger value="analysis" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-cyan-400">
+              <TabsTrigger value="analysis" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <Sparkles className="h-3.5 w-3.5" />
                 AI Analysis
               </TabsTrigger>
-              <TabsTrigger value="optimization" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-cyan-400">
+              <TabsTrigger value="optimization" className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground">
                 <Lightbulb className="h-3.5 w-3.5" />
                 AI Optimization
               </TabsTrigger>

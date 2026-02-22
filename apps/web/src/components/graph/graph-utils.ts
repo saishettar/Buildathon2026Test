@@ -61,8 +61,8 @@ export function computeGraphLayout(
           step.status === "failed"
             ? "#ef4444"
             : step.status === "running"
-            ? "#3b82f6"
-            : "#6b7280",
+            ? "#a1a1aa"
+            : "#3f3f46",
         strokeWidth: 2,
       },
     }));

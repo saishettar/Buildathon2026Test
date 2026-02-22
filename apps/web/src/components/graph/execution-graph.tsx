@@ -100,15 +100,15 @@ export function ExecutionGraph({
         nodeStrokeWidth={3}
         nodeColor={(node) => {
           const step = node.data as Step;
-          if (!step) return "#6b7280";
+          if (!step) return "#3f3f46";
           const colors: Record<string, string> = {
-            llm: "#3b82f6",
-            tool: "#8b5cf6",
-            plan: "#f59e0b",
-            final: "#22c55e",
+            llm: "#e4e4e7",
+            tool: "#a1a1aa",
+            plan: "#71717a",
+            final: "#fafafa",
             error: "#ef4444",
           };
-          return colors[step.type] || "#6b7280";
+          return colors[step.type] || "#3f3f46";
         }}
         className="!bg-card/80"
       />

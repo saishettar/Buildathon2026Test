@@ -48,8 +48,8 @@ export default function DashboardPage() {
           /* ── Empty State ─────────────────────────────────────────── */
           <div className="flex flex-1 items-center justify-center">
             <div className="text-center max-w-md">
-              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-cyan-500/10 mb-6">
-                <Activity className="h-10 w-10 text-cyan-400" />
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-foreground/10 mb-6">
+                <Activity className="h-10 w-10 text-foreground" />
               </div>
               <h2 className="text-2xl font-bold tracking-tight text-foreground">
                 Welcome to Tenor
@@ -75,7 +75,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-cyan-400" />
+                    <Sparkles className="h-5 w-5 text-foreground" />
                     Agent Dashboard
                   </h1>
                   <p className="text-xs text-muted-foreground mt-0.5">

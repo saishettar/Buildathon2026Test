@@ -30,11 +30,11 @@ function ScoreRing({ score }: { score: number }) {
   const offset = circumference - (score / 100) * circumference;
   const color =
     score >= 90
-      ? "text-green-400"
+      ? "text-white"
       : score >= 70
-      ? "text-blue-400"
+      ? "text-zinc-300"
       : score >= 50
-      ? "text-yellow-400"
+      ? "text-zinc-500"
       : "text-red-400";
 
   return (
@@ -83,10 +83,10 @@ function AnalysisSection({
 }) {
   const iconColor =
     variant === "warning"
-      ? "text-yellow-400"
+      ? "text-zinc-400"
       : variant === "success"
-      ? "text-green-400"
-      : "text-blue-400";
+      ? "text-zinc-400"
+      : "text-zinc-400";
 
   return (
     <div className="space-y-2">
@@ -123,8 +123,8 @@ export function AnalysisPanel({ runId, runStatus }: AnalysisPanelProps) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center space-y-4 max-w-sm">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20">
-            <Sparkles className="h-8 w-8 text-violet-400" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-800 border border-zinc-700">
+            <Sparkles className="h-8 w-8 text-foreground" />
           </div>
           <div>
             <h3 className="text-lg font-semibold">AI Performance Analysis</h3>
@@ -139,7 +139,7 @@ export function AnalysisPanel({ runId, runStatus }: AnalysisPanelProps) {
           <Button
             onClick={runAnalysis}
             disabled={runStatus === "running"}
-            className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
+            className="bg-foreground text-background hover:bg-foreground/90"
           >
             <Sparkles className="mr-2 h-4 w-4" />
             {runStatus === "running" ? "Wait for run to complete" : "Analyze Performance"}
@@ -153,7 +153,7 @@ export function AnalysisPanel({ runId, runStatus }: AnalysisPanelProps) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center space-y-3">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto text-violet-400" />
+          <Loader2 className="h-10 w-10 animate-spin mx-auto text-foreground" />
           <p className="text-sm text-muted-foreground">
             Claude is analyzing your workflow...
           </p>
@@ -222,13 +222,13 @@ export function AnalysisPanel({ runId, runStatus }: AnalysisPanelProps) {
         {/* Recommendations */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-amber-400" />
+            <Zap className="h-4 w-4 text-foreground" />
             <h4 className="text-sm font-semibold">Recommendations</h4>
           </div>
           <div className="space-y-2 pl-6">
             {analysis.recommendations.map((rec, i) => (
               <div key={i} className="flex items-start gap-2">
-                <CheckCircle2 className="h-4 w-4 mt-0.5 text-green-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 mt-0.5 text-zinc-400 shrink-0" />
                 <p className="text-sm text-muted-foreground">{rec}</p>
               </div>
             ))}

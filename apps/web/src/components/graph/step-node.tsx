@@ -7,26 +7,26 @@ import { cn, formatDuration, formatTokens } from "@/lib/utils";
 import type { Step, StepType, StepStatus } from "@/types";
 
 const TYPE_BORDER: Record<StepType, string> = {
-  llm: "border-l-blue-500",
-  tool: "border-l-purple-500",
-  plan: "border-l-amber-500",
-  final: "border-l-green-500",
+  llm: "border-l-zinc-300",
+  tool: "border-l-zinc-400",
+  plan: "border-l-zinc-500",
+  final: "border-l-white",
   error: "border-l-red-500",
 };
 
 const STATUS_RING: Record<StepStatus, string> = {
-  running: "ring-2 ring-blue-500/40",
+  running: "ring-2 ring-zinc-400/40",
   completed: "",
   failed: "ring-2 ring-red-500/40",
-  retrying: "ring-2 ring-orange-500/40",
+  retrying: "ring-2 ring-zinc-500/40",
 };
 
 const TYPE_ICON: Record<StepType, string> = {
-  llm: "🧠",
-  tool: "🔧",
-  plan: "📋",
-  final: "✅",
-  error: "❌",
+  llm: "◆",
+  tool: "▪",
+  plan: "▸",
+  final: "●",
+  error: "✕",
 };
 
 function StepNodeComponent({ data, selected }: NodeProps<Step>) {
@@ -85,7 +85,7 @@ function StepNodeComponent({ data, selected }: NodeProps<Step>) {
           {totalTokens > 0 && <span>{formatTokens(totalTokens)} tok</span>}
           {step.status === "running" && (
             <span className="flex items-center gap-1">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-400 animate-pulse" />
               processing
             </span>
           )}

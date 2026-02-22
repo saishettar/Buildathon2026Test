@@ -43,20 +43,20 @@ function ScoreGauge({ score }: { score: number }) {
 
   const color =
     score >= 90
-      ? "#22d3ee"
+      ? "#fafafa"
       : score >= 70
-      ? "#34d399"
+      ? "#a1a1aa"
       : score >= 50
-      ? "#fbbf24"
+      ? "#71717a"
       : "#ef4444";
 
   const bgGlow =
     score >= 90
-      ? "shadow-cyan-500/20"
+      ? "shadow-zinc-300/20"
       : score >= 70
-      ? "shadow-emerald-500/20"
+      ? "shadow-zinc-400/20"
       : score >= 50
-      ? "shadow-amber-500/20"
+      ? "shadow-zinc-500/20"
       : "shadow-red-500/20";
 
   return (
@@ -230,7 +230,7 @@ export function PerformanceMetrics({ run, steps }: PerformanceMetricsProps) {
         {/* Token Usage */}
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-foreground/80 flex items-center gap-2">
-            <Hash className="h-4 w-4 text-cyan-400" />
+            <Hash className="h-4 w-4 text-foreground" />
             Token Usage
           </h4>
           <div className="grid grid-cols-3 gap-3">
@@ -238,23 +238,23 @@ export function PerformanceMetrics({ run, steps }: PerformanceMetricsProps) {
               icon={ArrowUpRight}
               label="Input Tokens"
               value={formatTokens(metrics.totalPromptTokens)}
-              iconColor="text-cyan-400"
-              color="text-cyan-400"
+              iconColor="text-zinc-400"
+              color="text-zinc-300"
             />
             <MetricCard
               icon={ArrowDownRight}
               label="Output Tokens"
               value={formatTokens(metrics.totalCompletionTokens)}
-              iconColor="text-violet-400"
-              color="text-violet-400"
+              iconColor="text-zinc-400"
+              color="text-zinc-300"
             />
             <MetricCard
               icon={TrendingUp}
               label="Total Tokens"
               value={formatTokens(metrics.totalTokens)}
               subValue={`${((metrics.totalPromptTokens / Math.max(metrics.totalTokens, 1)) * 100).toFixed(0)}% input`}
-              iconColor="text-emerald-400"
-              color="text-emerald-400"
+              iconColor="text-zinc-400"
+              color="text-foreground"
             />
           </div>
         </div>
@@ -262,7 +262,7 @@ export function PerformanceMetrics({ run, steps }: PerformanceMetricsProps) {
         {/* Cost Analysis */}
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-foreground/80 flex items-center gap-2">
-            <DollarSign className="h-4 w-4 text-emerald-400" />
+            <DollarSign className="h-4 w-4 text-foreground" />
             Cost Analysis
           </h4>
           <div className="grid grid-cols-3 gap-3">
@@ -270,22 +270,22 @@ export function PerformanceMetrics({ run, steps }: PerformanceMetricsProps) {
               icon={DollarSign}
               label="Total Cost"
               value={formatCost(metrics.totalCost)}
-              iconColor="text-emerald-400"
-              color="text-emerald-400"
+              iconColor="text-zinc-400"
+              color="text-foreground"
             />
             <MetricCard
               icon={DollarSign}
               label="Avg Per Step"
               value={formatCost(metrics.stepsCount > 0 ? metrics.totalCost / metrics.stepsCount : 0)}
-              iconColor="text-amber-400"
-              color="text-amber-400"
+              iconColor="text-zinc-400"
+              color="text-zinc-300"
             />
             <MetricCard
               icon={DollarSign}
               label="Cost / 1k Tokens"
               value={formatCost(metrics.totalTokens > 0 ? (metrics.totalCost / metrics.totalTokens) * 1000 : 0)}
-              iconColor="text-cyan-400"
-              color="text-cyan-400"
+              iconColor="text-zinc-400"
+              color="text-zinc-300"
             />
           </div>
         </div>
@@ -293,7 +293,7 @@ export function PerformanceMetrics({ run, steps }: PerformanceMetricsProps) {
         {/* Latency & Timing */}
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-foreground/80 flex items-center gap-2">
-            <Clock className="h-4 w-4 text-violet-400" />
+            <Clock className="h-4 w-4 text-foreground" />
             Latency & Timing
           </h4>
           <div className="grid grid-cols-4 gap-3">
@@ -301,29 +301,29 @@ export function PerformanceMetrics({ run, steps }: PerformanceMetricsProps) {
               icon={Clock}
               label="Average"
               value={formatDuration(Math.round(metrics.avgDuration))}
-              iconColor="text-violet-400"
-              color="text-violet-400"
+              iconColor="text-zinc-400"
+              color="text-zinc-300"
             />
             <MetricCard
               icon={Clock}
               label="P50"
               value={formatDuration(metrics.p50)}
-              iconColor="text-blue-400"
-              color="text-blue-400"
+              iconColor="text-zinc-400"
+              color="text-zinc-300"
             />
             <MetricCard
               icon={Clock}
               label="P95"
               value={formatDuration(metrics.p95)}
-              iconColor="text-amber-400"
-              color="text-amber-400"
+              iconColor="text-zinc-400"
+              color="text-zinc-300"
             />
             <MetricCard
               icon={Clock}
               label="P99"
               value={formatDuration(metrics.p99)}
-              iconColor="text-red-400"
-              color="text-red-400"
+              iconColor="text-zinc-400"
+              color="text-zinc-300"
             />
           </div>
         </div>
@@ -331,7 +331,7 @@ export function PerformanceMetrics({ run, steps }: PerformanceMetricsProps) {
         {/* Error Handling */}
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-foreground/80 flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-400" />
+            <AlertTriangle className="h-4 w-4 text-foreground" />
             Error Handling
           </h4>
           <div className="grid grid-cols-3 gap-3">
@@ -340,23 +340,23 @@ export function PerformanceMetrics({ run, steps }: PerformanceMetricsProps) {
               label="Error Rate"
               value={`${metrics.errorRate}%`}
               subValue={`${metrics.failedSteps} failed of ${metrics.stepsCount}`}
-              iconColor={metrics.errorRate > 0 ? "text-red-400" : "text-emerald-400"}
-              color={metrics.errorRate > 0 ? "text-red-400" : "text-emerald-400"}
+              iconColor={metrics.errorRate > 0 ? "text-red-400" : "text-zinc-400"}
+              color={metrics.errorRate > 0 ? "text-red-400" : "text-zinc-300"}
             />
             <MetricCard
               icon={RotateCcw}
               label="Retries"
               value={metrics.retryingSteps.toString()}
-              iconColor="text-orange-400"
-              color="text-orange-400"
+              iconColor="text-zinc-400"
+              color="text-zinc-300"
             />
             <MetricCard
               icon={CheckCircle2}
               label="Completed"
               value={metrics.completedSteps.toString()}
               subValue={`${metrics.stepsCount > 0 ? Math.round((metrics.completedSteps / metrics.stepsCount) * 100) : 0}% success`}
-              iconColor="text-emerald-400"
-              color="text-emerald-400"
+              iconColor="text-zinc-400"
+              color="text-foreground"
             />
           </div>
 

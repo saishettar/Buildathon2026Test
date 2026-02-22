@@ -51,18 +51,18 @@ const STATUS_ICONS: Record<StepStatus, React.ElementType> = {
 };
 
 const TYPE_COLORS: Record<StepType, string> = {
-  llm: "border-l-blue-500",
-  tool: "border-l-purple-500",
-  plan: "border-l-amber-500",
-  final: "border-l-emerald-500",
+  llm: "border-l-zinc-300",
+  tool: "border-l-zinc-400",
+  plan: "border-l-zinc-500",
+  final: "border-l-white",
   error: "border-l-red-500",
 };
 
 const STATUS_LINE_COLORS: Record<StepStatus, string> = {
-  running: "bg-blue-500/40",
-  completed: "bg-cyan-500/30",
+  running: "bg-zinc-400/40",
+  completed: "bg-zinc-500/30",
   failed: "bg-red-500/40",
-  retrying: "bg-orange-500/40",
+  retrying: "bg-zinc-500/40",
 };
 
 export function ExecutionChain({ steps, onStepClick, selectedStepId }: ExecutionChainProps) {
@@ -101,7 +101,7 @@ export function ExecutionChain({ steps, onStepClick, selectedStepId }: Execution
                 <div
                   className={cn(
                     "absolute left-6 top-[68px] w-0.5 h-8",
-                    isFailed ? "bg-red-500/60" : STATUS_LINE_COLORS[step.status]
+                    isFailed ? "bg-red-500/50" : STATUS_LINE_COLORS[step.status]
                   )}
                 />
               )}
@@ -112,10 +112,10 @@ export function ExecutionChain({ steps, onStepClick, selectedStepId }: Execution
                 className={cn(
                   "relative w-full text-left rounded-lg border-l-4 border border-border bg-card p-4 mb-2",
                   "transition-all duration-200 hover:bg-accent hover:border-muted-foreground/30",
-                  "focus:outline-none focus:ring-2 focus:ring-cyan-500/30",
+                  "focus:outline-none focus:ring-2 focus:ring-zinc-400/30",
                   TYPE_COLORS[step.type],
                   isFailed && "border-red-500/50 bg-red-500/5",
-                  isSelected && "ring-2 ring-cyan-500/40 border-cyan-500/40"
+                  isSelected && "ring-2 ring-zinc-400/40 border-zinc-400/40"
                 )}
               >
                 <div className="flex items-start gap-3">
@@ -123,10 +123,10 @@ export function ExecutionChain({ steps, onStepClick, selectedStepId }: Execution
                   <div
                     className={cn(
                       "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-                      step.type === "llm" && "bg-blue-500/15 text-blue-400",
-                      step.type === "tool" && "bg-purple-500/15 text-purple-400",
-                      step.type === "plan" && "bg-amber-500/15 text-amber-400",
-                      step.type === "final" && "bg-emerald-500/15 text-emerald-400",
+                      step.type === "llm" && "bg-zinc-300/15 text-zinc-300",
+                      step.type === "tool" && "bg-zinc-400/15 text-zinc-400",
+                      step.type === "plan" && "bg-zinc-500/15 text-zinc-400",
+                      step.type === "final" && "bg-zinc-200/15 text-zinc-200",
                       step.type === "error" && "bg-red-500/15 text-red-400"
                     )}
                   >

@@ -63,8 +63,8 @@ export function HeaderStats({ run, steps, isLoading }: HeaderStatsProps) {
         <StatusIcon
           className={cn(
             "h-4 w-4",
-            run.status === "running" && "animate-spin text-blue-400",
-            run.status === "completed" && "text-green-400",
+            run.status === "running" && "animate-spin text-zinc-300",
+            run.status === "completed" && "text-zinc-400",
             run.status === "failed" && "text-red-400"
           )}
         />
@@ -106,7 +106,7 @@ export function HeaderStats({ run, steps, isLoading }: HeaderStatsProps) {
       <div className="flex items-center gap-1.5 text-sm">
         <Coins className="h-3.5 w-3.5 text-muted-foreground" />
         <span className="text-muted-foreground">Cost:</span>
-        <span className="font-medium text-green-400">{formatCost(totalCost)}</span>
+        <span className="font-medium text-foreground">{formatCost(totalCost)}</span>
       </div>
     </div>
   );

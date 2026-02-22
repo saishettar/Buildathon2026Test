@@ -43,8 +43,8 @@ import { cn, shortId, formatTimestamp } from "@/lib/utils";
 import type { Run, RunStatus } from "@/types";
 
 const STATUS_DOT: Record<RunStatus, string> = {
-  running: "text-blue-400 animate-pulse",
-  completed: "text-green-400",
+  running: "text-zinc-300 animate-pulse",
+  completed: "text-zinc-400",
   failed: "text-red-400",
 };
 
@@ -117,7 +117,7 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
           onClick={() => router.push("/dashboard")}
           className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
-          <Home className="h-4 w-4 text-emerald-400" />
+          <Home className="h-4 w-4 text-foreground" />
           Home
         </button>
       </div>
@@ -173,7 +173,7 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
           onClick={() => router.push("/optimization")}
           className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
-          <Sparkles className="h-4 w-4 text-purple-400" />
+          <Sparkles className="h-4 w-4 text-foreground" />
           AI Optimization
         </button>
       </div>
@@ -201,14 +201,14 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
             )}
           >
             {launchingReal === s.id ? (
-              <Loader2 className="h-4 w-4 animate-spin text-green-400" />
+              <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
             ) : (
-              <IconComp className="h-4 w-4 text-green-400" />
+              <IconComp className="h-4 w-4 text-zinc-400" />
             )}
             <span className="flex-1 truncate text-left">{s.label}</span>
             <Badge
               variant="outline"
-              className="text-[9px] px-1 py-0 border-green-500/40 text-green-400"
+              className="text-[9px] px-1 py-0 border-zinc-500/40 text-zinc-400"
             >
               LIVE
             </Badge>
