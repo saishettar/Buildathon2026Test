@@ -6,7 +6,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "UAOP – Universal Agent Observability Platform",
+  title: "Tenor – AI Agent Observability Platform",
   description: "Real-time observability for AI agent execution traces",
 };
 

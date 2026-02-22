@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { TenorLogo } from "@/components/brand/tenor-logo";
 import { useRuns, useScenarios, useCreateRun } from "@/hooks/use-runs";
 import { cn, shortId, formatTimestamp } from "@/lib/utils";
 import type { Run, RunStatus } from "@/types";
@@ -60,17 +61,7 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
     <div className="flex h-full w-72 flex-col border-r bg-card">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-4">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <Activity className="h-4 w-4 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold tracking-tight">UAOP</h1>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Observability
-            </p>
-          </div>
-        </div>
+        <TenorLogo size="sm" />
         <ThemeToggle />
       </div>
 
