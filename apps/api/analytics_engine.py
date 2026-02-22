@@ -279,11 +279,224 @@ def compute_analytics() -> dict[str, Any]:
         "unique_models": len(model_usage),
     }
 
-    return {
+    result = {
         "fleet_summary": fleet_summary,
         "per_scenario": per_scenario,
         "per_model": per_model,
         "error_hotspots": error_hotspots,
         "merge_candidates": merge_candidates,
         "scheduling": scheduling,
+    }
+
+    # Compute deterministic optimization score
+    result["optimization_score"] = _compute_optimization_score(result)
+
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Deterministic Optimization Score (0-100)
+# ---------------------------------------------------------------------------
+# Five weighted dimensions ensure the score reflects real fleet health and
+# spans the full 0-100 range based on actual data quality.
+#
+#   Dimension              Weight   What it measures
+#   ─────────────────────  ──────   ────────────────────────────────────────
+#   Reliability              30%    Fleet success rate + worst-scenario penalty
+#   Cost Efficiency          25%    Avg cost per step relative to thresholds
+#   Performance              20%    Avg step latency relative to thresholds
+#   Error Health             15%    Error concentration + worst-scenario drag
+#   Model Optimization       10%    Expensive model overuse ratio
+# ---------------------------------------------------------------------------
+
+def _compute_optimization_score(analytics: dict) -> dict:
+    """Return a deterministic score breakdown from analytics metrics."""
+
+    fleet = analytics["fleet_summary"]
+    per_scenario = analytics["per_scenario"]
+    per_model = analytics["per_model"]
+    error_hotspots = analytics["error_hotspots"]
+
+    # ── 1. Reliability (30%) ──────────────────────────────────────────────
+    # Base: overall success rate, scaled non-linearly (production systems
+    # should be ≥99%; even 95% is mediocre at scale).
+    sr = fleet["overall_success_rate"]  # 0-100
+    if sr >= 99.5:
+        reliability = 100
+    elif sr >= 98:
+        reliability = 85 + (sr - 98) * 10        # 98-99.5 → 85-100
+    elif sr >= 95:
+        reliability = 65 + (sr - 95) * (20 / 3)  # 95-98  → 65-85
+    elif sr >= 90:
+        reliability = 40 + (sr - 90) * 5          # 90-95  → 40-65
+    elif sr >= 80:
+        reliability = 15 + (sr - 80) * 2.5        # 80-90  → 15-40
+    elif sr >= 60:
+        reliability = (sr - 60) * 0.75            # 60-80  → 0-15
+    else:
+        reliability = 0
+
+    # Worst-scenario penalty: if any scenario is below 80% success, drag
+    # the score down — a fleet is only as strong as its weakest link.
+    scenario_rates = [v["success_rate"] for v in per_scenario.values()]
+    if scenario_rates:
+        worst = min(scenario_rates)
+        if worst < 80:
+            penalty = (80 - worst) * 0.5  # up to 40 points penalty
+            reliability = max(0, reliability - penalty)
+
+    reliability = round(min(100, max(0, reliability)), 1)
+
+    # ── 2. Cost Efficiency (25%) ──────────────────────────────────────────
+    # Avg cost per step.  Thresholds calibrated for typical LLM pricing:
+    #   <$0.002 → excellent, $0.005 → good, $0.015 → mediocre, >$0.04 → poor
+    avg_cost = fleet["avg_cost_per_step"]
+    if avg_cost <= 0.001:
+        cost_eff = 100
+    elif avg_cost <= 0.003:
+        cost_eff = 85 + (0.003 - avg_cost) / 0.002 * 15
+    elif avg_cost <= 0.008:
+        cost_eff = 65 + (0.008 - avg_cost) / 0.005 * 20
+    elif avg_cost <= 0.015:
+        cost_eff = 40 + (0.015 - avg_cost) / 0.007 * 25
+    elif avg_cost <= 0.03:
+        cost_eff = 15 + (0.03 - avg_cost) / 0.015 * 25
+    elif avg_cost <= 0.06:
+        cost_eff = (0.06 - avg_cost) / 0.03 * 15
+    else:
+        cost_eff = 0
+
+    # Scenario cost variance penalty: if costliest scenario is ≥5× cheapest
+    scenario_costs = [v["avg_cost_per_step"] for v in per_scenario.values() if v["avg_cost_per_step"] > 0]
+    if len(scenario_costs) >= 2:
+        cost_ratio = max(scenario_costs) / max(min(scenario_costs), 0.0001)
+        if cost_ratio > 10:
+            cost_eff = max(0, cost_eff - 10)
+        elif cost_ratio > 5:
+            cost_eff = max(0, cost_eff - 5)
+
+    cost_eff = round(min(100, max(0, cost_eff)), 1)
+
+    # ── 3. Performance / Latency (20%) ────────────────────────────────────
+    # Avg step latency.  Thresholds:
+    #   <300ms → excellent, 500ms → good, 1500ms → mediocre, >5000ms → poor
+    avg_lat = fleet["avg_duration_ms"]
+    if avg_lat <= 200:
+        perf = 100
+    elif avg_lat <= 500:
+        perf = 80 + (500 - avg_lat) / 300 * 20
+    elif avg_lat <= 1000:
+        perf = 55 + (1000 - avg_lat) / 500 * 25
+    elif avg_lat <= 2000:
+        perf = 30 + (2000 - avg_lat) / 1000 * 25
+    elif avg_lat <= 5000:
+        perf = 5 + (5000 - avg_lat) / 3000 * 25
+    elif avg_lat <= 10000:
+        perf = (10000 - avg_lat) / 5000 * 5
+    else:
+        perf = 0
+
+    perf = round(min(100, max(0, perf)), 1)
+
+    # ── 4. Error Health (15%) ─────────────────────────────────────────────
+    # Measures how well-distributed and manageable errors are.
+    total_failed = fleet["failed_runs"]
+    total_runs = fleet["total_runs"]
+
+    if total_failed == 0:
+        error_health = 100
+    else:
+        # Base: inverse of failure rate, scaled
+        fail_rate = total_failed / total_runs * 100  # 0-100
+        if fail_rate <= 1:
+            error_health = 90
+        elif fail_rate <= 3:
+            error_health = 70 + (3 - fail_rate) / 2 * 20
+        elif fail_rate <= 7:
+            error_health = 40 + (7 - fail_rate) / 4 * 30
+        elif fail_rate <= 15:
+            error_health = 10 + (15 - fail_rate) / 8 * 30
+        elif fail_rate <= 30:
+            error_health = (30 - fail_rate) / 15 * 10
+        else:
+            error_health = 0
+
+        # Concentration penalty: if top hotspot accounts for a huge share
+        if error_hotspots:
+            top_hotspot_count = error_hotspots[0]["failure_count"] if error_hotspots else 0
+            hotspot_share = top_hotspot_count / max(total_failed, 1)
+            if hotspot_share > 0.3:
+                error_health = max(0, error_health - 10)
+
+        # Breadth penalty: how many scenarios have failures?
+        failing_scenarios = sum(1 for v in per_scenario.values() if v["failed"] > 0)
+        total_scenarios = len(per_scenario)
+        if total_scenarios > 0 and failing_scenarios / total_scenarios > 0.5:
+            error_health = max(0, error_health - 10)
+
+    error_health = round(min(100, max(0, error_health)), 1)
+
+    # ── 5. Model Optimization (10%) ───────────────────────────────────────
+    # Penalise if the most expensive models are used for a large share of
+    # steps, since cheaper models often suffice for simpler tasks.
+    if per_model:
+        model_items = sorted(per_model.items(), key=lambda x: x[1].get("cost_per_1k_tokens", 0), reverse=True)
+        total_steps = sum(v["usage_count"] for v in per_model.values())
+
+        # Top-2 most expensive models' share of total steps
+        expensive_steps = sum(v["usage_count"] for _, v in model_items[:2]) if len(model_items) >= 2 else 0
+        expensive_share = expensive_steps / max(total_steps, 1)
+
+        if expensive_share <= 0.15:
+            model_opt = 100
+        elif expensive_share <= 0.30:
+            model_opt = 75 + (0.30 - expensive_share) / 0.15 * 25
+        elif expensive_share <= 0.50:
+            model_opt = 45 + (0.50 - expensive_share) / 0.20 * 30
+        elif expensive_share <= 0.75:
+            model_opt = 15 + (0.75 - expensive_share) / 0.25 * 30
+        else:
+            model_opt = (1.0 - expensive_share) / 0.25 * 15
+
+        # Bonus: model diversity (more models = more optimized fleet)
+        unique_models = len(per_model)
+        if unique_models >= 5:
+            model_opt = min(100, model_opt + 5)
+        elif unique_models <= 1:
+            model_opt = max(0, model_opt - 15)
+    else:
+        model_opt = 50  # no model data
+
+    model_opt = round(min(100, max(0, model_opt)), 1)
+
+    # ── Weighted total ────────────────────────────────────────────────────
+    overall = round(
+        reliability * 0.30 +
+        cost_eff * 0.25 +
+        perf * 0.20 +
+        error_health * 0.15 +
+        model_opt * 0.10,
+        1,
+    )
+
+    # Identify weakest dimensions for Claude to focus on
+    dimensions = [
+        ("reliability", reliability, 0.30),
+        ("cost_efficiency", cost_eff, 0.25),
+        ("performance", perf, 0.20),
+        ("error_health", error_health, 0.15),
+        ("model_optimization", model_opt, 0.10),
+    ]
+    weakest = sorted(dimensions, key=lambda x: x[1])
+
+    return {
+        "overall_score": overall,
+        "breakdown": {
+            "reliability": {"score": reliability, "weight": "30%", "inputs": {"success_rate": sr, "worst_scenario_rate": worst if scenario_rates else None}},
+            "cost_efficiency": {"score": cost_eff, "weight": "25%", "inputs": {"avg_cost_per_step": avg_cost}},
+            "performance": {"score": perf, "weight": "20%", "inputs": {"avg_latency_ms": avg_lat}},
+            "error_health": {"score": error_health, "weight": "15%", "inputs": {"total_failures": total_failed, "failing_scenarios": sum(1 for v in per_scenario.values() if v["failed"] > 0)}},
+            "model_optimization": {"score": model_opt, "weight": "10%", "inputs": {"unique_models": len(per_model), "expensive_model_share": round(expensive_share, 3) if per_model else None}},
+        },
+        "weakest_dimensions": [{"name": w[0], "score": w[1]} for w in weakest[:3]],
     }

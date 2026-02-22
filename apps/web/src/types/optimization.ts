@@ -7,6 +7,7 @@ export interface AgentRecommendation {
   title: string;
   suggestion: string;
   estimated_impact: string;
+  addresses_dimension?: "reliability" | "cost_efficiency" | "performance" | "error_health" | "model_optimization";
 }
 
 export interface AutomationSuggestion {
