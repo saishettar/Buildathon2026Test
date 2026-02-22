@@ -37,6 +37,7 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { TenorLogo } from "@/components/brand/tenor-logo";
 import { useRuns, useScenarios, useCreateRun } from "@/hooks/use-runs";
 import { startRealRun } from "@/lib/api";
+import { useQueryClient } from "@tanstack/react-query";
 import { cn, shortId, formatTimestamp } from "@/lib/utils";
 import type { Run, RunStatus } from "@/types";
 
@@ -64,6 +65,7 @@ interface SidebarProps {
 
 export function Sidebar({ selectedRunId }: SidebarProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: runs, isLoading: runsLoading } = useRuns();
   const { data: scenariosData } = useScenarios();
   const createRun = useCreateRun();
@@ -89,6 +91,7 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
     setLaunchingReal(scenarioId);
     try {
       const result = await startRealRun(scenarioId);
+      queryClient.invalidateQueries({ queryKey: ["runs"] });
       router.push(`/runs/${result.run_id}`);
     } catch (e) {
       console.error("Failed to start real run:", e);

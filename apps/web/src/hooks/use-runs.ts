@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { listRuns, getRun, createRun, listScenarios } from "@/lib/api";
 import type { CreateRunRequest } from "@/types";
 
@@ -8,7 +8,9 @@ export function useRuns() {
   return useQuery({
     queryKey: ["runs"],
     queryFn: () => listRuns(50),
-    refetchInterval: 5000,
+    refetchInterval: 3000,
+    // Keep showing previous data while refetching to avoid flicker
+    placeholderData: keepPreviousData,
   });
 }
 
