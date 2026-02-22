@@ -10,6 +10,8 @@ export function useSteps(runId: string | undefined) {
     queryKey: ["steps", runId],
     queryFn: () => getRunSteps(runId!),
     enabled: !!runId,
+    // Poll as a fallback in case the WebSocket disconnects
+    refetchInterval: 3000,
   });
 }
 

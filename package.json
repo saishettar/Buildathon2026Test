@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev:web": "cd apps/web && pnpm dev",
-    "dev:api": "cd apps/api && python3 -m uvicorn main:app --reload --reload-exclude 'generated' --host 0.0.0.0 --port 8000",
+    "dev:api": "cd apps/api && python3 -m uvicorn main:app --reload --reload-exclude '*/generated/*' --host 0.0.0.0 --port 8000",
     "dev": "concurrently \"pnpm dev:api\" \"pnpm dev:web\"",
     "build:web": "cd apps/web && pnpm build",
     "install:all": "pnpm install && cd apps/api && pip install -r requirements.txt"

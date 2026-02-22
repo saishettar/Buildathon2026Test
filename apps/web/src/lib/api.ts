@@ -62,8 +62,8 @@ export async function listScenarios(): Promise<ScenariosResponse> {
 
 export async function startRealRun(
   scenario: string
-): Promise<{ run_id: string }> {
-  return fetchJson<{ run_id: string }>(`${API_URL}/api/runs/real`, {
+): Promise<Run> {
+  return fetchJson<Run>(`${API_URL}/api/runs/real`, {
     method: "POST",
     body: JSON.stringify({ scenario }),
   });

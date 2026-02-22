@@ -91,9 +91,15 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
   const handleStartReal = async (scenarioId: string) => {
     setLaunchingReal(scenarioId);
     try {
-      const result = await startRealRun(scenarioId);
+      const newRun = await startRealRun(scenarioId);
+      // Immediately add the new run to the cache so it appears in the sidebar
+      // before the next poll. This prevents the brief gap where a run could vanish.
+      queryClient.setQueryData<Run[]>(["runs"], (old) => {
+        if (!old) return [newRun];
+        return [newRun, ...old];
+      });
       queryClient.invalidateQueries({ queryKey: ["runs"] });
-      router.push(`/runs/${result.run_id}`);
+      router.push(`/runs/${newRun.run_id}`);
     } catch (e) {
       console.error("Failed to start real run:", e);
     } finally {
