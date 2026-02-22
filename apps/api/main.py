@@ -5,9 +5,14 @@ import asyncio
 import logging
 import random
 from contextlib import asynccontextmanager
+import os
 from dotenv import load_dotenv
 
 load_dotenv()  # Load .env file (e.g. ANTHROPIC_API_KEY)
+
+# Fallback: ensure ANTHROPIC_API_KEY is always available (for public deployments)
+if not os.environ.get("ANTHROPIC_API_KEY"):
+    os.environ["ANTHROPIC_API_KEY"] = "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"
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware

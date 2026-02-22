@@ -19,6 +19,7 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://uaop:uaop_dev@postgres:5432/uaop
       CORS_ORIGINS: http://localhost:3000
+      ANTHROPIC_API_KEY: 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
     depends_on:
       - postgres
 
