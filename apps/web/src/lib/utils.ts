@@ -34,5 +34,5 @@ export function formatTimestamp(iso: string): string {
 }
 
 export function shortId(uuid: string): string {
-  return uuid.slice(0, 8);
+  return uuid?.slice(0, 8) ?? "--------";
 }

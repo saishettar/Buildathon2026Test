@@ -8,17 +8,19 @@ from dotenv import load_dotenv
 
 load_dotenv()  # Load .env file (e.g. ANTHROPIC_API_KEY)
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from pydantic import BaseModel
 from models import (
     Run, Step, CreateRunRequest, CreateStepRequest,
-    RunStatus, StepStatus, StepType, RunMetadata,
+    RunStatus, StepStatus, StepType, RunMetadata, SystemType,
 )
 from database import db
 from websocket_manager import manager
 from simulator import run_simulation
-from scenarios import SCENARIOS, SCENARIO_LABELS
+from scenarios import SCENARIOS, SCENARIO_LABELS, REAL_SCENARIO_META
+from real_agents import run_real_agent, REAL_SCENARIOS
 from chat import ChatRequest, get_chat_response
 from analysis import analyze_run, summarize_step
 from optimization import router as optimization_router
@@ -68,13 +70,38 @@ async def health():
 
 @app.get("/api/scenarios")
 async def list_scenarios():
-    """Return available demo scenarios."""
-    return {
-        "scenarios": [
-            {"id": k, "label": v}
-            for k, v in SCENARIO_LABELS.items()
-        ]
-    }
+    """Return available demo and real scenarios."""
+    mock = [
+        {"id": k, "label": v, "real": False}
+        for k, v in SCENARIO_LABELS.items()
+    ]
+    real = [
+        {"id": s["id"], "label": s["label"], "real": True, "description": s["description"], "icon": s["icon"]}
+        for s in REAL_SCENARIO_META
+    ]
+    return {"scenarios": mock + real}
+
+
+class RealRunRequest(BaseModel):
+    scenario: str
+
+
+@app.post("/api/runs/real")
+async def create_real_run(req: RealRunRequest):
+    """Create a run powered by real Claude API calls."""
+    if req.scenario not in REAL_SCENARIOS:
+        raise HTTPException(status_code=400, detail=f"Unknown real scenario: {req.scenario}")
+
+    run = Run(
+        system_type=SystemType.claude,
+        metadata=RunMetadata(tags=["real", req.scenario]),
+    )
+    db.create_run(run)
+    logger.info(f"Created real run {run.run_id} (scenario={req.scenario})")
+
+    asyncio.create_task(run_real_agent(run.run_id, req.scenario))
+
+    return run.model_dump()
 
 
 @app.post("/api/runs")
@@ -106,7 +133,7 @@ async def get_run(run_id: str):
     """Get a single run by ID."""
     run = db.get_run(run_id)
     if not run:
-        return {"error": "Run not found"}, 404
+        raise HTTPException(status_code=404, detail="Run not found")
     return run.model_dump()
 
 
@@ -146,10 +173,10 @@ async def analyze_run_endpoint(run_id: str):
     """Generate a Claude-powered performance analysis for a run."""
     run = db.get_run(run_id)
     if not run:
-        return {"error": "Run not found"}, 404
+        raise HTTPException(status_code=404, detail="Run not found")
     raw_steps = db.get_steps_for_run(run_id)
     if not raw_steps:
-        return {"error": "No steps found for this run"}, 404
+        raise HTTPException(status_code=404, detail="No steps found for this run")
 
     result = await analyze_run(
         run.model_dump(),
@@ -163,7 +190,7 @@ async def summarize_step_endpoint(step_id: str):
     """Generate a human-readable summary of a step's input/output."""
     step = db.get_step(step_id)
     if not step:
-        return {"error": "Step not found"}, 404
+        raise HTTPException(status_code=404, detail="Step not found")
     result = await summarize_step(step.model_dump())
     return result.model_dump()
 

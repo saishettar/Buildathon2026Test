@@ -470,3 +470,30 @@ SCENARIO_LABELS: dict[str, str] = {
     "customer_support": "Customer Support (classify + retrieve + draft)",
     "simple_happy_path": "Simple Happy Path (plan → tool → final)",
 }
+
+REAL_SCENARIO_META: list[dict] = [
+    {
+        "id": "hotel_research",
+        "name": "Hotel Research Agent",
+        "label": "🏨 Hotel Research Agent",
+        "description": "Real Claude-powered agent that researches hotels, compares prices, and recommends the best option",
+        "real": True,
+        "icon": "🏨",
+    },
+    {
+        "id": "code_generator",
+        "name": "Code Generator Agent",
+        "label": "💻 Code Generator Agent",
+        "description": "Real Claude-powered agent that plans, writes, saves, and reviews a Tic Tac Toe game",
+        "real": True,
+        "icon": "💻",
+    },
+    {
+        "id": "research_summarize",
+        "name": "Research & Summarize Agent",
+        "label": "📊 Research & Summarize Agent",
+        "description": "Real Claude-powered agent that researches AI regulation across US and EU in parallel and synthesizes findings",
+        "real": True,
+        "icon": "📊",
+    },
+]

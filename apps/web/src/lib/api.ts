@@ -58,6 +58,17 @@ export async function listScenarios(): Promise<ScenariosResponse> {
   return fetchJson<ScenariosResponse>(`${API_URL}/api/scenarios`);
 }
 
+// ─── Real Agent Runs ────────────────────────────────────────────────────────
+
+export async function startRealRun(
+  scenario: string
+): Promise<{ run_id: string }> {
+  return fetchJson<{ run_id: string }>(`${API_URL}/api/runs/real`, {
+    method: "POST",
+    body: JSON.stringify({ scenario }),
+  });
+}
+
 // ─── Chat ───────────────────────────────────────────────────────────────────
 
 export interface ChatMessage {

@@ -48,6 +48,9 @@ export interface Step {
 export interface Scenario {
   id: string;
   label: string;
+  real?: boolean;
+  description?: string;
+  icon?: string;
 }
 
 // ─── WebSocket message types ────────────────────────────────────────────────

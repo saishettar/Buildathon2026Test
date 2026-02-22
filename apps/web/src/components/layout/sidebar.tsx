@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Activity,
@@ -8,6 +9,7 @@ import {
   Play,
   Loader2,
   Sparkles,
+  Zap,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +27,7 @@ import {
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { TenorLogo } from "@/components/brand/tenor-logo";
 import { useRuns, useScenarios, useCreateRun } from "@/hooks/use-runs";
+import { startRealRun } from "@/lib/api";
 import { cn, shortId, formatTimestamp } from "@/lib/utils";
 import type { Run, RunStatus } from "@/types";
 
@@ -43,8 +46,11 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
   const { data: runs, isLoading: runsLoading } = useRuns();
   const { data: scenariosData } = useScenarios();
   const createRun = useCreateRun();
+  const [launchingReal, setLaunchingReal] = useState<string | null>(null);
 
   const scenarios = scenariosData?.scenarios ?? [];
+  const mockScenarios = scenarios.filter((s) => !s.real);
+  const realScenarios = scenarios.filter((s) => s.real);
 
   const handleStartDemo = async (scenarioId: string) => {
     try {
@@ -55,6 +61,18 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
       router.push(`/runs/${run.run_id}`);
     } catch (e) {
       console.error("Failed to create run:", e);
+    }
+  };
+
+  const handleStartReal = async (scenarioId: string) => {
+    setLaunchingReal(scenarioId);
+    try {
+      const result = await startRealRun(scenarioId);
+      router.push(`/runs/${result.run_id}`);
+    } catch (e) {
+      console.error("Failed to start real run:", e);
+    } finally {
+      setLaunchingReal(null);
     }
   };
 
@@ -96,7 +114,7 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
           <DropdownMenuContent className="w-64" align="start">
             <DropdownMenuLabel>Choose a scenario</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {scenarios.map((s) => (
+            {mockScenarios.map((s) => (
               <DropdownMenuItem
                 key={s.id}
                 onClick={() => handleStartDemo(s.id)}
@@ -120,6 +138,42 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
           <Sparkles className="h-4 w-4 text-purple-400" />
           AI Optimization
         </button>
+      </div>
+
+      <Separator />
+
+      {/* Live Agent Runs */}
+      <div className="px-4 py-2">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Live Agent Runs
+        </h2>
+      </div>
+
+      <div className="space-y-1 px-3 pb-2">
+        {realScenarios.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => handleStartReal(s.id)}
+            disabled={launchingReal !== null}
+            className={cn(
+              "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+              launchingReal === s.id && "opacity-60"
+            )}
+          >
+            {launchingReal === s.id ? (
+              <Loader2 className="h-4 w-4 animate-spin text-green-400" />
+            ) : (
+              <Zap className="h-4 w-4 text-green-400" />
+            )}
+            <span className="flex-1 truncate text-left">{s.label}</span>
+            <Badge
+              variant="outline"
+              className="text-[9px] px-1 py-0 border-green-500/40 text-green-400"
+            >
+              LIVE
+            </Badge>
+          </button>
+        ))}
       </div>
 
       <Separator />
