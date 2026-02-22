@@ -10,6 +10,15 @@ import {
   Loader2,
   Sparkles,
   Zap,
+  Search,
+  Plug,
+  AlertTriangle,
+  Database,
+  Layers,
+  FileText,
+  Code,
+  Hotel,
+  BookOpen,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +44,18 @@ const STATUS_DOT: Record<RunStatus, string> = {
   running: "text-blue-400 animate-pulse",
   completed: "text-green-400",
   failed: "text-red-400",
+};
+
+const SCENARIO_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  hotel: Hotel,
+  code: Code,
+  research: BookOpen,
+  search: Search,
+  plug: Plug,
+  alert: AlertTriangle,
+  database: Database,
+  layers: Layers,
+  "file-text": FileText,
 };
 
 interface SidebarProps {
@@ -150,7 +171,9 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
       </div>
 
       <div className="space-y-1 px-3 pb-2">
-        {realScenarios.map((s) => (
+        {realScenarios.map((s) => {
+          const IconComp = SCENARIO_ICONS[(s as any).icon] ?? Zap;
+          return (
           <button
             key={s.id}
             onClick={() => handleStartReal(s.id)}
@@ -163,7 +186,7 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
             {launchingReal === s.id ? (
               <Loader2 className="h-4 w-4 animate-spin text-green-400" />
             ) : (
-              <Zap className="h-4 w-4 text-green-400" />
+              <IconComp className="h-4 w-4 text-green-400" />
             )}
             <span className="flex-1 truncate text-left">{s.label}</span>
             <Badge
@@ -173,7 +196,8 @@ export function Sidebar({ selectedRunId }: SidebarProps) {
               LIVE
             </Badge>
           </button>
-        ))}
+          );
+        })}
       </div>
 
       <Separator />
